@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { CartEntry } from "./components/CartDrawer";
 import { CartDrawer } from "./components/CartDrawer";
 import { CheckoutModal } from "./components/CheckoutModal";
@@ -7,13 +7,42 @@ import { PlantIcon } from "./components/PlantIcon";
 import { WhatsAppIcon } from "./components/WhatsAppIcon";
 import {
   CATEGORIES,
-  PLANTS,
   whatsappLink,
 } from "./data/plants";
+import { AdminPage } from "./pages/AdminPage";
+import { Link } from "./lib/router";
+import { useRoute } from "./lib/route";
+import { OrdersProvider } from "./store/OrdersContext";
+import { useOrders } from "./store/ordersContextValue";
+import { PlantsProvider } from "./store/PlantsContext";
+import { usePlants } from "./store/plantsContextValue";
 
 type Category = (typeof CATEGORIES)[number];
 
 export default function App() {
+  return (
+    <PlantsProvider>
+      <OrdersProvider>
+        <Root />
+      </OrdersProvider>
+    </PlantsProvider>
+  );
+}
+
+function Root() {
+  const route = useRoute();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [route]);
+
+  if (route.startsWith("/admin")) return <AdminPage />;
+  return <ShopApp />;
+}
+
+function ShopApp() {
+  const { plants } = usePlants();
+  const { addOrder } = useOrders();
   const [cart, setCart] = useState<CartEntry[]>([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
@@ -22,8 +51,8 @@ export default function App() {
   const toastTimer = useRef<number | null>(null);
 
   const plantsById = useMemo(
-    () => new Map(PLANTS.map((plant) => [plant.id, plant])),
-    [],
+    () => new Map(plants.map((plant) => [plant.id, plant])),
+    [plants],
   );
 
   const cartCount = cart.reduce((sum, entry) => sum + entry.qty, 0);
@@ -98,6 +127,10 @@ export default function App() {
         open={checkoutOpen}
         entries={checkoutEntries}
         onClose={() => setCheckoutOpen(false)}
+        onPlaceOrder={(payload) => {
+          addOrder(payload);
+          showToast("Order sent — you can track it in the admin page");
+        }}
       />
 
       {toast && (
@@ -184,6 +217,11 @@ function Header({
 }
 
 function Hero() {
+  const { plants } = usePlants();
+  const inStock = plants.filter((plant) => plant.stockCount > 0);
+  const heroPlants =
+    inStock.length >= 3 ? inStock.slice(0, 3) : plants.slice(0, 3);
+
   return (
     <section
       id="top"
@@ -267,9 +305,9 @@ function Hero() {
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="animate-floaty relative flex items-end justify-center gap-6">
                 {[
-                  { plant: PLANTS[0], rotate: "-rotate-6", delay: "0s" },
-                  { plant: PLANTS[6], rotate: "rotate-0", delay: "1.2s" },
-                  { plant: PLANTS[7], rotate: "rotate-6", delay: "0.6s" },
+                  { plant: heroPlants[0], rotate: "-rotate-6", delay: "0s" },
+                  { plant: heroPlants[1], rotate: "rotate-0", delay: "1.2s" },
+                  { plant: heroPlants[2], rotate: "rotate-6", delay: "0.6s" },
                 ].map(({ plant, rotate, delay }) => (
                   <div
                     key={plant.id}
@@ -303,12 +341,13 @@ function Shop({
   onCategory: (category: Category) => void;
   onAdd: (id: string) => void;
 }) {
+  const { plants } = usePlants();
   const visiblePlants = useMemo(
     () =>
       category === "All"
-        ? PLANTS
-        : PLANTS.filter((plant) => plant.category === category),
-    [category],
+        ? plants
+        : plants.filter((plant) => plant.category === category),
+    [category, plants],
   );
 
   return (
@@ -469,6 +508,14 @@ function Footer() {
               <a href="#top" className="transition-colors hover:text-sun-200">
                 Back to top
               </a>
+            </li>
+            <li>
+              <Link
+                to="/admin"
+                className="transition-colors hover:text-sun-200"
+              >
+                Admin
+              </Link>
             </li>
           </ul>
         </div>

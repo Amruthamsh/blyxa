@@ -10,13 +10,54 @@ export type PlantArtVariant =
   | "fern"
   | "lavender";
 
+export const ART_VARIANTS: PlantArtVariant[] = [
+  "monstera",
+  "fiddle",
+  "pothos",
+  "snake",
+  "lily",
+  "aloe",
+  "zz",
+  "rubber",
+  "fern",
+  "lavender",
+];
+
+export interface ArtPalette {
+  pot: string;
+  leaf: string;
+  accent: string;
+}
+
+export const ART_PALETTES: ArtPalette[] = [
+  { pot: "#b5633a", leaf: "#3f8f3d", accent: "#7cc06b" },
+  { pot: "#cfd8c9", leaf: "#4c8f4a", accent: "#8fbf72" },
+  { pot: "#e2b93c", leaf: "#4fa443", accent: "#ffe46a" },
+  { pot: "#415d43", leaf: "#4e7d46", accent: "#9ccf8a" },
+  { pot: "#344e41", leaf: "#3f8f5a", accent: "#9fd1a8" },
+  { pot: "#c98a5b", leaf: "#37663a", accent: "#8fbf9a" },
+  { pot: "#8fb27a", leaf: "#4c8f4a", accent: "#a3cb9c" },
+  { pot: "#a89fc4", leaf: "#6a9c5a", accent: "#8b6fc7" },
+];
+
+export const PLANT_CATEGORIES = [
+  "Indoor",
+  "Air purifying",
+  "Low light",
+  "Outdoor",
+] as const;
+
+export type PlantCategory = (typeof PLANT_CATEGORIES)[number];
+
+export const CATEGORIES = ["All", ...PLANT_CATEGORIES] as const;
+
 export interface Plant {
   id: string;
   name: string;
   latin: string;
   price: number;
   stockCount: number;
-  category: "Indoor" | "Air purifying" | "Low light" | "Outdoor";
+  category: PlantCategory;
   description: string;
   tag?: string;
   art: PlantArtVariant;
@@ -223,11 +264,3 @@ export function buildOrderMessage(
     noteLine,
   ].join("\n");
 }
-
-export const CATEGORIES = [
-  "All",
-  "Indoor",
-  "Air purifying",
-  "Low light",
-  "Outdoor",
-] as const;

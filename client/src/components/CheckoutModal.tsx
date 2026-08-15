@@ -2,15 +2,27 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import type { Plant } from "../data/plants";
 import { buildOrderMessage, formatPrice, whatsappLink } from "../data/plants";
+import type { OrderItem } from "../store/OrdersContext";
 import { WhatsAppIcon } from "./WhatsAppIcon";
 
 interface CheckoutModalProps {
   open: boolean;
   entries: { plant: Plant; qty: number }[];
   onClose: () => void;
+  onPlaceOrder: (payload: {
+    name: string;
+    note: string;
+    items: OrderItem[];
+    total: number;
+  }) => void;
 }
 
-export function CheckoutModal({ open, entries, onClose }: CheckoutModalProps) {
+export function CheckoutModal({
+  open,
+  entries,
+  onClose,
+  onPlaceOrder,
+}: CheckoutModalProps) {
   const [name, setName] = useState("");
   const [note, setNote] = useState("");
   const [sent, setSent] = useState(false);
@@ -25,7 +37,14 @@ export function CheckoutModal({ open, entries, onClose }: CheckoutModalProps) {
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
     if (!name.trim()) return;
+    const items: OrderItem[] = entries.map(({ plant, qty }) => ({
+      id: plant.id,
+      name: plant.name,
+      price: plant.price,
+      qty,
+    }));
     const message = buildOrderMessage(entries, name, note);
+    onPlaceOrder({ name: name.trim(), note: note.trim(), items, total });
     window.open(whatsappLink(message), "_blank", "noopener,noreferrer");
     setSent(true);
   };
