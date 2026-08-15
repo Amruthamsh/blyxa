@@ -1,22 +1,27 @@
 High level architecture of the application:
 
 ```
-
-                    Blyxa Enterprises
+                    BLYXA ENTERPRISES
                            │
-              ┌────────────┴────────────┐
-              │                         │
-          Customer                    Admin
-              │                         │
-       Product catalogue          Google Login
-       Order form                       │
-              │                         ▼
-              └────────────────────► Supabase
-                                │
-                         ┌──────┼──────┐
-                         │      │      │
-                       DB     Auth   Storage
-                         │
-                    Products
-                    Orders
+                ┌──────────┴──────────┐
+                │                     │
+             Customer                Admin
+                │                     │
+          React / Next.js        Google OAuth
+                │                     │
+                └──────────┬──────────┘
+                           │
+                      Supabase
+                           │
+          ┌────────────────┼────────────────┐
+          │                │                │
+       Database          Auth           Storage
+      PostgreSQL       Google OAuth      Images
+          │
+          ▼
+     Edge Functions
+          │
+     ┌────┴─────┐
+     │          │
+   Orders    Products
 ```
