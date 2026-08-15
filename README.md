@@ -11,7 +11,7 @@ High level architecture of the application:
        Product catalogue          Google Login
        Order form                       │
               │                         ▼
-              └──────────────► Supabase
+              └────────────────────► Supabase
                                 │
                          ┌──────┼──────┐
                          │      │      │
@@ -20,7 +20,3 @@ High level architecture of the application:
                     Products
                     Orders
 ```
-
-Branching strategy:
-
-main -> feature branches
