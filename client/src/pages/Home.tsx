@@ -42,14 +42,17 @@ function formatPrice(amount: number) {
   }).format(amount)
 }
 
-function openWhatsApp(lines: string[]) {
+function openWhatsApp(message: string) {
   const number = whatsappNumber.replace(/\D/g, '')
   if (!number) return
-  const message = `Hello, I have placed an order. Kindly share updates on the status and expected delivery time.\n\nOrder details:\n${lines.join('\n')}`
   window.open(
     `https://wa.me/${number}?text=${encodeURIComponent(message)}`,
     '_blank',
   )
+}
+
+function orderMessage(lines: string[]) {
+  return `Hello, I have placed an order. Kindly share updates on the status and expected delivery time.\n\nOrder details:\n${lines.join('\n')}`
 }
 
 function Stepper({
@@ -151,6 +154,7 @@ export default function Home() {
     (sum, p) => sum + p.price * cart[p.id],
     0,
   )
+  const hasNumber = whatsappNumber.replace(/\D/g, '') !== ''
 
   const checkoutItems = checkoutProduct
     ? [{ product: checkoutProduct, qty: checkoutQty }]
@@ -181,6 +185,27 @@ export default function Home() {
     setCheckoutProduct(product)
     setCheckoutQty(1)
     setCheckoutOpen(true)
+  }
+
+  function discussProduct(product: Product) {
+    openWhatsApp(
+      `Hello, I'd like to discuss this product:\n\n- ${product.name} (${formatPrice(product.price)})`,
+    )
+  }
+
+  function discussCart() {
+    const lines = cartItems.map(
+      (p) => `- ${p.name} x${cart[p.id]} = ${formatPrice(p.price * cart[p.id])}`,
+    )
+    openWhatsApp(`Hello, I'd like to discuss this order:\n\n${lines.join('\n')}`)
+  }
+
+  function discussCheckout() {
+    const lines = checkoutItems.map(
+      (item) =>
+        `- ${item.product.name} x${item.qty} = ${formatPrice(item.product.price * item.qty)}`,
+    )
+    openWhatsApp(`Hello, I'd like to discuss this order:\n\n${lines.join('\n')}`)
   }
 
   function openCartCheckout() {
@@ -271,9 +296,11 @@ export default function Home() {
       setCheckoutQty(1)
       setCheckoutOpen(false)
       openWhatsApp(
-        checkoutItems.map(
-          (item) =>
-            `- ${item.product.name} x${item.qty} = ${formatPrice(item.product.price * item.qty)}`,
+        orderMessage(
+          checkoutItems.map(
+            (item) =>
+              `- ${item.product.name} x${item.qty} = ${formatPrice(item.product.price * item.qty)}`,
+          ),
         ),
       )
     } catch (err) {
@@ -385,6 +412,15 @@ export default function Home() {
                       Order now
                     </button>
                   </div>
+
+                  <button
+                    type="button"
+                    onClick={() => discussProduct(product)}
+                    disabled={!hasNumber}
+                    className="mt-3 w-full rounded-lg border border-slate-700 px-3 py-2 text-sm font-medium text-slate-300 transition hover:bg-slate-800 active:scale-[0.97] disabled:opacity-40"
+                  >
+                    Discuss in WhatsApp
+                  </button>
                 </div>
               </div>
             )
@@ -533,6 +569,14 @@ export default function Home() {
               className="w-full rounded-lg bg-emerald-500 px-6 py-3 font-semibold text-slate-950 transition hover:bg-emerald-400"
             >
               Checkout
+            </button>
+            <button
+              type="button"
+              onClick={discussCart}
+              disabled={!hasNumber}
+              className="mt-3 w-full rounded-lg border border-slate-700 px-6 py-3 font-semibold text-slate-300 transition hover:bg-slate-800 disabled:opacity-40"
+            >
+              Discuss in WhatsApp
             </button>
           </div>
         )}
@@ -692,6 +736,14 @@ export default function Home() {
                 className="w-full rounded-lg bg-emerald-500 px-6 py-3 font-semibold text-slate-950 transition hover:bg-emerald-400 disabled:opacity-60"
               >
                 {submitting ? 'Placing order…' : 'Place order'}
+              </button>
+              <button
+                type="button"
+                onClick={discussCheckout}
+                disabled={!hasNumber}
+                className="w-full rounded-lg border border-slate-700 px-6 py-3 font-semibold text-slate-300 transition hover:bg-slate-800 disabled:opacity-40"
+              >
+                Discuss in WhatsApp
               </button>
             </form>
           </div>
