@@ -12,6 +12,7 @@ import {
 } from "../lib/whatsapp";
 import Header from "../components/Header";
 import Hero from "../components/Hero";
+import SocialMedia from "../components/SocialMedia";
 import ProductGrid from "../components/ProductGrid";
 import CartDrawer, { WhatsAppIcon } from "../components/CartDrawer";
 import CheckoutModal from "../components/CheckoutModal";
@@ -398,6 +399,8 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        <SocialMedia />
       </main>
 
       <footer className="border-t border-forest-900/10">
