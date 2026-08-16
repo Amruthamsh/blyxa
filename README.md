@@ -1,4 +1,4 @@
-# Blyxa — Living Botanicals & Plants
+# Blyxa
 
 Full-stack e-commerce application for **Blyxa**, a plant nursery. It pairs a React storefront and admin dashboard (this repo's `client/`) with a Supabase backend (database, auth, storage, and a Deno edge function in `server/`). Static assets are deployed to Cloudflare.
 
