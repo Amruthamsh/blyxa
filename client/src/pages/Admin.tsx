@@ -25,9 +25,10 @@ const emptyProductForm = {
   description: '',
   price: '',
   stock: '0',
-  image_url: '',
   is_active: true,
 }
+
+const PRODUCT_IMAGE_BUCKET = 'product-images'
 
 export default function Admin() {
   const navigate = useNavigate()
@@ -42,6 +43,8 @@ export default function Admin() {
   const [showAddProduct, setShowAddProduct] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [productForm, setProductForm] = useState(emptyProductForm)
+  const [imageFile, setImageFile] = useState<File | null>(null)
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     async function checkAuth() {
@@ -95,6 +98,7 @@ export default function Admin() {
   async function startCreate() {
     setEditingProduct(null)
     setProductForm(emptyProductForm)
+    setImageFile(null)
     setShowAddProduct(true)
   }
 
@@ -105,16 +109,37 @@ export default function Admin() {
       description: product.description ?? '',
       price: String(product.price),
       stock: String(product.stock),
-      image_url: product.image_url ?? '',
       is_active: product.is_active,
     })
+    setImageFile(null)
     setShowAddProduct(true)
   }
 
   function cancelForm() {
     setEditingProduct(null)
     setProductForm(emptyProductForm)
+    setImageFile(null)
     setShowAddProduct(false)
+  }
+
+  async function uploadProductImage(file: File, productId: string) {
+    const extension = file.name.split('.').pop()?.toLowerCase() || 'webp'
+    const path = `${productId}/main-${Date.now()}.${extension}`
+
+    const { data, error } = await supabase.storage
+      .from(PRODUCT_IMAGE_BUCKET)
+      .upload(path, file, {
+        cacheControl: '31536000',
+        upsert: false,
+      })
+
+    if (error) throw error
+
+    const { data: publicUrlData } = supabase.storage
+      .from(PRODUCT_IMAGE_BUCKET)
+      .getPublicUrl(data.path)
+
+    return publicUrlData.publicUrl
   }
 
   async function submitProduct(event: FormEvent) {
@@ -123,28 +148,58 @@ export default function Admin() {
     const stock = parseInt(productForm.stock, 10) || 0
     if (!productForm.name.trim() || Number.isNaN(price) || price < 0) return
 
-    const payload = {
-      name: productForm.name.trim(),
-      description: productForm.description.trim() || null,
-      price,
-      stock,
-      image_url: productForm.image_url.trim() || null,
-      is_active: productForm.is_active,
-    }
-
-    const { error } = editingProduct
-      ? await supabase
-          .from('products')
-          .update(payload)
-          .eq('id', editingProduct.id)
-      : await supabase.from('products').insert(payload)
-
-    if (error) {
-      setError(error.message)
+    if (!editingProduct && !imageFile) {
+      setError('Please upload a product image.')
       return
     }
-    cancelForm()
-    await fetchData()
+
+    setSaving(true)
+    setError(null)
+
+    try {
+      if (editingProduct) {
+        let imageUrl = editingProduct.image_url
+        if (imageFile) {
+          imageUrl = await uploadProductImage(imageFile, editingProduct.id)
+        }
+
+        const { error } = await supabase
+          .from('products')
+          .update({
+            name: productForm.name.trim(),
+            description: productForm.description.trim() || null,
+            price,
+            stock,
+            image_url: imageUrl,
+            is_active: productForm.is_active,
+          })
+          .eq('id', editingProduct.id)
+
+        if (error) throw error
+      } else {
+        const productId = crypto.randomUUID()
+        const imageUrl = await uploadProductImage(imageFile!, productId)
+
+        const { error } = await supabase.from('products').insert({
+          id: productId,
+          name: productForm.name.trim(),
+          description: productForm.description.trim() || null,
+          price,
+          stock,
+          image_url: imageUrl,
+          is_active: productForm.is_active,
+        })
+
+        if (error) throw error
+      }
+
+      cancelForm()
+      await fetchData()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save product')
+    } finally {
+      setSaving(false)
+    }
   }
 
   async function updateOrderStatus(order: Order, status: OrderStatus) {
@@ -318,18 +373,36 @@ export default function Admin() {
                   />
                 </div>
                 <div className="sm:col-span-2">
-                  <label htmlFor="image_url" className="mb-1 block text-sm text-slate-400">
-                    Image URL
+                  <label htmlFor="product-image" className="mb-1 block text-sm text-slate-400">
+                    Product image
                   </label>
                   <input
-                    id="image_url"
-                    value={productForm.image_url}
+                    id="product-image"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/avif"
+                    required={!editingProduct}
                     onChange={(e) =>
-                      updateProductForm('image_url', e.target.value)
+                      setImageFile(e.target.files?.[0] ?? null)
                     }
-                    placeholder="https://… (optional)"
                     className={inputClass}
                   />
+                  <p className="mt-1 text-xs text-slate-500">
+                    Square images look best (1:1).
+                  </p>
+                  {editingProduct?.image_url && !imageFile && (
+                    <img
+                      src={editingProduct.image_url}
+                      alt={editingProduct.name}
+                      className="mt-3 aspect-square w-32 rounded-lg object-cover"
+                    />
+                  )}
+                  {imageFile && (
+                    <img
+                      src={URL.createObjectURL(imageFile)}
+                      alt="Preview"
+                      className="mt-3 aspect-square w-32 rounded-lg object-cover"
+                    />
+                  )}
                 </div>
                 <label className="flex items-center gap-3 text-sm text-slate-300 sm:col-span-2">
                   <input
@@ -345,9 +418,14 @@ export default function Admin() {
                 <div className="sm:col-span-2">
                   <button
                     type="submit"
-                    className="w-full rounded-lg bg-emerald-500 px-4 py-2.5 font-semibold text-slate-950 transition hover:bg-emerald-400"
+                    disabled={saving}
+                    className="w-full rounded-lg bg-emerald-500 px-4 py-2.5 font-semibold text-slate-950 transition hover:bg-emerald-400 disabled:opacity-60"
                   >
-                    {editingProduct ? 'Save changes' : 'Create product'}
+                    {saving
+                      ? 'Saving…'
+                      : editingProduct
+                        ? 'Save changes'
+                        : 'Create product'}
                   </button>
                 </div>
               </form>

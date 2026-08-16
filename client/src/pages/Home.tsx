@@ -369,12 +369,17 @@ export default function Home() {
                   cart[product.id] ? 'border-emerald-500' : 'border-slate-800'
                 }`}
               >
-                {product.image_url && (
+                {product.image_url ? (
                   <img
                     src={product.image_url}
                     alt={product.name}
-                    className="h-48 w-full object-cover"
+                    loading="lazy"
+                    className="aspect-square w-full object-cover"
                   />
+                ) : (
+                  <div className="flex aspect-square w-full items-center justify-center bg-slate-800 text-sm text-slate-500">
+                    No image
+                  </div>
                 )}
                 <div className="p-4">
                   <h3 className="text-lg font-semibold">{product.name}</h3>
