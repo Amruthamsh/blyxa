@@ -298,7 +298,22 @@ export default function Home() {
   }
 
   return (
-    <div id="top" className="min-h-screen bg-sand-50 text-forest-950">
+    <div
+      id="top"
+      className="relative min-h-screen bg-sand-50 text-forest-950"
+    >
+      <img
+        src="/border-top.png"
+        alt=""
+        aria-hidden="true"
+        className="pointer-events-none absolute top-0 left-0 w-96 opacity-12 sm:w-[30rem] lg:w-[44rem]"
+      />
+      <img
+        src="/border-bottom.png"
+        alt=""
+        aria-hidden="true"
+        className="pointer-events-none absolute bottom-0 right-0 w-96 opacity-12 sm:w-[30rem] lg:w-[44rem]"
+      />
       <Header
         cartCount={cartCount}
         onOpenCart={() => setCartOpen(true)}

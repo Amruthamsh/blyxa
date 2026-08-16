@@ -8,7 +8,7 @@ interface HeroProps {
 
 export default function Hero({ onShop, onDiscuss }: HeroProps) {
   return (
-    <section className="relative overflow-hidden">
+    <section className="relative z-10 overflow-hidden">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 pt-8 pb-8 sm:px-6 lg:grid-cols-2 lg:items-center lg:gap-16 lg:pt-14 lg:pb-10 lg:px-8">
         <div className="max-w-xl">
           <p className="mb-4 text-sm font-semibold uppercase tracking-[0.25em] text-moss-600">
