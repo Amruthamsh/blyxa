@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
@@ -12,6 +12,18 @@ export default function Login() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    async function checkSignedIn() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      if (user && (await isAdminUser(user.id))) {
+        navigate('/admin')
+      }
+    }
+    checkSignedIn()
+  }, [navigate])
 
   async function handleLogin(event: FormEvent) {
     event.preventDefault()

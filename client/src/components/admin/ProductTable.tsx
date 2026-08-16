@@ -63,10 +63,10 @@ export default function ProductTable({ products, onEdit, onAdd }: ProductTablePr
                       </div>
                     )}
                     <div className="min-w-0">
-                      <p className="truncate font-semibold text-forest-950">
+                      <p className="max-w-[15rem] truncate font-semibold text-forest-950">
                         {product.name}
                       </p>
-                      <p className="truncate text-xs text-forest-900/50">
+                      <p className="max-w-[15rem] truncate text-xs text-forest-900/50">
                         {product.description || 'No description'}
                       </p>
                     </div>
