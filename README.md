@@ -1,6 +1,6 @@
 # Blyxa — Living Botanicals & Plants
 
-Full-stack e-commerce application for **Blyxa**, a small plant studio. It pairs a React storefront and admin dashboard (this repo's `client/`) with a Supabase backend (database, auth, storage, and a Deno edge function in `server/`). Static assets are deployed to Cloudflare.
+Full-stack e-commerce application for **Blyxa**, a plant nursery. It pairs a React storefront and admin dashboard (this repo's `client/`) with a Supabase backend (database, auth, storage, and a Deno edge function in `server/`). Static assets are deployed to Cloudflare.
 
 ```
                     BLYXA ENTERPRISES
@@ -54,6 +54,7 @@ Full-stack e-commerce application for **Blyxa**, a small plant studio. It pairs 
 ## Features
 
 ### Storefront (`/`)
+
 - Hero, product collection, about, and contact sections
 - Product grid with live stock indicators ("Out of stock", "Only 1 left", "All in your cart")
 - Shopping cart drawer with quantity steppers and per-item totals
@@ -63,11 +64,13 @@ Full-stack e-commerce application for **Blyxa**, a small plant studio. It pairs 
 - Checkout details persisted to `localStorage`
 
 ### Admin (`/login`, `/admin`)
+
 - Email/password sign-in via Supabase Auth, restricted to users in the `admin_users` table
 - Product management: create, edit, activate/deactivate, upload product images
 - Order management: view orders with line items and update status (`new` → `confirmed` → `processing` → `completed` / `cancelled`)
 
 ### Backend
+
 - **`products`, `orders`, `order_items`, `admin_users`** tables
 - **RLS**: products are publicly readable; admins get full management access
 - **`create-order` edge function**: validates the payload, locks product rows, inserts the order + items in a single transaction, and decrements stock
