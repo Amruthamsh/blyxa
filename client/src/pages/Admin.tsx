@@ -4,31 +4,23 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { isAdminUser } from '../lib/admin'
 import type { Order, OrderStatus, Product } from '../lib/types'
+import AdminLayout from '../components/admin/AdminLayout'
+import ProductForm from '../components/admin/ProductForm'
+import type { ProductFormValues } from '../components/admin/ProductForm'
+import ProductTable from '../components/admin/ProductTable'
+import OrderList from '../components/admin/OrderList'
+import { Skeleton } from '../components/LoadingState'
+import Button from '../components/Button'
 
-const ORDER_STATUSES: OrderStatus[] = [
-  'new',
-  'confirmed',
-  'processing',
-  'completed',
-  'cancelled',
-]
+const PRODUCT_IMAGE_BUCKET = 'product-images'
 
-function formatPrice(amount: number) {
-  return new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency: 'INR',
-  }).format(amount)
-}
-
-const emptyProductForm = {
+const emptyProductForm: ProductFormValues = {
   name: '',
   description: '',
   price: '',
   stock: '0',
   is_active: true,
 }
-
-const PRODUCT_IMAGE_BUCKET = 'product-images'
 
 export default function Admin() {
   const navigate = useNavigate()
@@ -45,6 +37,7 @@ export default function Admin() {
   const [productForm, setProductForm] = useState(emptyProductForm)
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [saving, setSaving] = useState(false)
+  const [statusUpdating, setStatusUpdating] = useState(false)
 
   useEffect(() => {
     async function checkAuth() {
@@ -67,6 +60,8 @@ export default function Admin() {
   }, [navigate])
 
   async function fetchData() {
+    setLoading(true)
+    setError(null)
     const [productResult, orderResult] = await Promise.all([
       supabase
         .from('products')
@@ -95,11 +90,13 @@ export default function Admin() {
     fetchData()
   }, [])
 
-  async function startCreate() {
+  function startCreate() {
     setEditingProduct(null)
     setProductForm(emptyProductForm)
     setImageFile(null)
+    setError(null)
     setShowAddProduct(true)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   function startEdit(product: Product) {
@@ -112,7 +109,9 @@ export default function Admin() {
       is_active: product.is_active,
     })
     setImageFile(null)
+    setError(null)
     setShowAddProduct(true)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   function cancelForm() {
@@ -146,10 +145,13 @@ export default function Admin() {
     event.preventDefault()
     const price = parseFloat(productForm.price)
     const stock = parseInt(productForm.stock, 10) || 0
-    if (!productForm.name.trim() || Number.isNaN(price) || price < 0) return
+    if (!productForm.name.trim() || Number.isNaN(price) || price < 0) {
+      setError('Please provide a plant name and a valid price.')
+      return
+    }
 
     if (!editingProduct && !imageFile) {
-      setError('Please upload a product image.')
+      setError('Please upload a product image. A product must have a photo.')
       return
     }
 
@@ -203,6 +205,7 @@ export default function Admin() {
   }
 
   async function updateOrderStatus(order: Order, status: OrderStatus) {
+    setStatusUpdating(true)
     const { error } = await supabase
       .from('orders')
       .update({ status })
@@ -215,11 +218,7 @@ export default function Admin() {
         prev.map((o) => (o.id === order.id ? { ...o, status } : o)),
       )
     }
-  }
-
-  function productName(productId: string) {
-    const product = products.find((p) => p.id === productId)
-    return product ? product.name : 'Unknown product'
+    setStatusUpdating(false)
   }
 
   function updateProductForm(field: keyof typeof emptyProductForm, value: string | boolean) {
@@ -231,335 +230,119 @@ export default function Admin() {
     navigate('/login')
   }
 
-  const inputClass =
-    'w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white placeholder:text-slate-500 focus:border-emerald-500 focus:outline-none'
-
   if (authorized !== true) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-950 text-white">
-        <p className="text-slate-400">Checking access…</p>
+      <div className="flex min-h-screen items-center justify-center bg-sand-50">
+        <div className="text-center">
+          <p className="text-sm text-forest-900/60">Checking access…</p>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white">
-      <header className="border-b border-slate-800">
-        <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <h1 className="text-xl font-bold">Admin</h1>
-          <div className="flex items-center gap-4">
-            <a href="/" className="text-sm text-slate-400 hover:text-white">
-              Back to shop
-            </a>
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="rounded-lg border border-slate-700 px-3 py-1.5 text-sm hover:bg-slate-800"
-            >
-              Sign out
-            </button>
-          </div>
-        </nav>
-      </header>
-
-      <main className="mx-auto max-w-6xl px-6 py-10">
-        <h2 className="mb-8 text-3xl font-bold">Dashboard</h2>
-
-        <div className="mb-8 flex gap-2">
-          <button
-            type="button"
-            onClick={() => setTab('products')}
-            className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${
-              tab === 'products'
-                ? 'bg-emerald-500 text-slate-950'
-                : 'border border-slate-700 text-slate-300 hover:bg-slate-800'
-            }`}
-          >
-            Products
-          </button>
-          <button
-            type="button"
-            onClick={() => setTab('orders')}
-            className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${
-              tab === 'orders'
-                ? 'bg-emerald-500 text-slate-950'
-                : 'border border-slate-700 text-slate-300 hover:bg-slate-800'
-            }`}
-          >
-            Orders
-          </button>
+    <AdminLayout
+      activeView={tab}
+      onNavigate={(view) => {
+        setTab(view)
+        setShowAddProduct(false)
+        setEditingProduct(null)
+        setError(null)
+      }}
+      onLogout={handleLogout}
+    >
+      {loading ? (
+        <div className="space-y-4">
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-40 w-full" />
+          <Skeleton className="h-40 w-full" />
         </div>
-
-        {loading && <p className="text-slate-400">Loading…</p>}
-        {error && <p className="text-red-400">Error: {error}</p>}
-        {!loading && !error && tab === 'products' && (
-          <section>
-            <div className="mb-6 flex items-center justify-between">
-              <h3 className="text-xl font-semibold">Products</h3>
-              <button
-                type="button"
-                onClick={showAddProduct ? cancelForm : startCreate}
-                className="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-emerald-400"
-              >
-                {showAddProduct ? 'Cancel' : '+ Add product'}
-              </button>
+      ) : (
+        <>
+          {error && !showAddProduct && (
+            <div
+              role="alert"
+              className="mb-6 flex flex-col items-start gap-3 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between"
+            >
+              <div>
+                <p className="text-sm font-semibold text-red-700">
+                  Something went wrong loading your dashboard.
+                </p>
+                <p className="text-sm text-red-600/80">{error}</p>
+              </div>
+              <Button variant="secondary" size="sm" onClick={fetchData}>
+                Try again
+              </Button>
             </div>
-
-            {showAddProduct && (
-              <form
-                onSubmit={submitProduct}
-                className="mb-8 grid grid-cols-1 gap-4 rounded-xl border border-slate-800 bg-slate-900 p-5 sm:grid-cols-2"
-              >
-                <h4 className="text-lg font-semibold sm:col-span-2">
-                  {editingProduct ? 'Edit product' : 'Add product'}
-                </h4>
-                <div className="sm:col-span-2">
-                  <label htmlFor="name" className="mb-1 block text-sm text-slate-400">
-                    Name
-                  </label>
-                  <input
-                    id="name"
-                    required
-                    value={productForm.name}
-                    onChange={(e) => updateProductForm('name', e.target.value)}
-                    placeholder="Product name"
-                    className={inputClass}
-                  />
-                </div>
-                <div className="sm:col-span-2">
-                  <label htmlFor="description" className="mb-1 block text-sm text-slate-400">
-                    Description
-                  </label>
-                  <input
-                    id="description"
-                    value={productForm.description}
-                    onChange={(e) =>
-                      updateProductForm('description', e.target.value)
-                    }
-                    placeholder="Short description (optional)"
-                    className={inputClass}
-                  />
-                </div>
+          )}
+          {tab === 'products' ? (
+            <section>
+              <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
                 <div>
-                  <label htmlFor="price" className="mb-1 block text-sm text-slate-400">
-                    Price (₹)
-                  </label>
-                  <input
-                    id="price"
-                    type="number"
-                    required
-                    min="0"
-                    step="0.01"
-                    value={productForm.price}
-                    onChange={(e) => updateProductForm('price', e.target.value)}
-                    placeholder="0.00"
-                    className={inputClass}
-                  />
-                </div>
-                <div>
-                  <label htmlFor="stock" className="mb-1 block text-sm text-slate-400">
-                    Stock
-                  </label>
-                  <input
-                    id="stock"
-                    type="number"
-                    required
-                    min="0"
-                    step="1"
-                    value={productForm.stock}
-                    onChange={(e) => updateProductForm('stock', e.target.value)}
-                    placeholder="0"
-                    className={inputClass}
-                  />
-                </div>
-                <div className="sm:col-span-2">
-                  <label htmlFor="product-image" className="mb-1 block text-sm text-slate-400">
-                    Product image
-                  </label>
-                  <input
-                    id="product-image"
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp,image/avif"
-                    required={!editingProduct}
-                    onChange={(e) =>
-                      setImageFile(e.target.files?.[0] ?? null)
-                    }
-                    className={inputClass}
-                  />
-                  <p className="mt-1 text-xs text-slate-500">
-                    Square images look best (1:1).
+                  <h3 className="font-serif text-3xl font-medium tracking-tight text-forest-950">
+                    Products
+                  </h3>
+                  <p className="mt-1 text-sm text-forest-900/55">
+                    {products.length} {products.length === 1 ? 'plant' : 'plants'} in your collection
                   </p>
-                  {editingProduct?.image_url && !imageFile && (
-                    <img
-                      src={editingProduct.image_url}
-                      alt={editingProduct.name}
-                      className="mt-3 aspect-square w-32 rounded-lg object-cover"
-                    />
-                  )}
-                  {imageFile && (
-                    <img
-                      src={URL.createObjectURL(imageFile)}
-                      alt="Preview"
-                      className="mt-3 aspect-square w-32 rounded-lg object-cover"
-                    />
-                  )}
                 </div>
-                <label className="flex items-center gap-3 text-sm text-slate-300 sm:col-span-2">
-                  <input
-                    type="checkbox"
-                    checked={productForm.is_active}
-                    onChange={(e) =>
-                      updateProductForm('is_active', e.target.checked)
-                    }
-                    className="h-4 w-4 accent-emerald-500"
+                {!showAddProduct && (
+                  <Button variant="primary" onClick={startCreate}>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                    Add product
+                  </Button>
+                )}
+              </div>
+
+              {showAddProduct && (
+                <div className="mb-8">
+                  <ProductForm
+                    values={productForm}
+                    imageFile={imageFile}
+                    editingProductName={editingProduct?.name}
+                    editingProductImageUrl={editingProduct?.image_url}
+                    required={!editingProduct}
+                    saving={saving}
+                    error={error}
+                    onFieldChange={updateProductForm}
+                    onImageChange={setImageFile}
+                    onSubmit={submitProduct}
+                    onCancel={cancelForm}
                   />
-                  Active
-                </label>
-                <div className="sm:col-span-2">
-                  <button
-                    type="submit"
-                    disabled={saving}
-                    className="w-full rounded-lg bg-emerald-500 px-4 py-2.5 font-semibold text-slate-950 transition hover:bg-emerald-400 disabled:opacity-60"
-                  >
-                    {saving
-                      ? 'Saving…'
-                      : editingProduct
-                        ? 'Save changes'
-                        : 'Create product'}
-                  </button>
                 </div>
-              </form>
-            )}
+              )}
 
-            {products.length === 0 ? (
-              <p className="text-slate-400">No products yet.</p>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm">
-                  <thead>
-                    <tr className="border-b border-slate-800 text-slate-400">
-                      <th className="py-3 pr-4">Name</th>
-                      <th className="py-3 pr-4">Price</th>
-                      <th className="py-3 pr-4">Stock</th>
-                      <th className="py-3 pr-4">Active</th>
-                      <th className="py-3">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {products.map((product) => (
-                      <tr key={product.id} className="border-b border-slate-800/50">
-                        <td className="py-3 pr-4">{product.name}</td>
-                        <td className="py-3 pr-4">{formatPrice(product.price)}</td>
-                        <td className="py-3 pr-4">{product.stock}</td>
-                        <td className="py-3 pr-4">
-                          <span
-                            className={
-                              product.is_active
-                                ? 'text-emerald-400'
-                                : 'text-slate-500'
-                            }
-                          >
-                            {product.is_active ? 'active' : 'inactive'}
-                          </span>
-                        </td>
-                        <td className="py-3">
-                          <button
-                            type="button"
-                            onClick={() => startEdit(product)}
-                            className="rounded-lg border border-slate-700 px-3 py-1 text-sm hover:bg-slate-800"
-                          >
-                            Edit
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              {!showAddProduct && (
+                <ProductTable
+                  products={products}
+                  onEdit={startEdit}
+                  onAdd={startCreate}
+                />
+              )}
+            </section>
+          ) : (
+            <section>
+              <div className="mb-6">
+                <h3 className="font-serif text-3xl font-medium tracking-tight text-forest-950">
+                  Orders
+                </h3>
+                <p className="mt-1 text-sm text-forest-900/55">
+                  {orders.length} {orders.length === 1 ? 'order' : 'orders'} received
+                </p>
               </div>
-            )}
-          </section>
-        )}
 
-        {!loading && !error && tab === 'orders' && (
-          <section>
-            <h3 className="mb-6 text-xl font-semibold">Orders</h3>
-
-            {orders.length === 0 ? (
-              <p className="text-slate-400">No orders yet.</p>
-            ) : (
-              <div className="space-y-4">
-                {orders.map((order) => (
-                  <div
-                    key={order.id}
-                    className="rounded-xl border border-slate-800 bg-slate-900 p-5"
-                  >
-                    <div className="flex flex-wrap items-start justify-between gap-4">
-                      <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-3">
-                          <h4 className="font-semibold">
-                            {order.customer_name}
-                          </h4>
-                          <span className="text-sm text-slate-500">
-                            {new Date(order.created_at).toLocaleString()}
-                          </span>
-                        </div>
-                        <div className="mt-1 space-y-0.5 text-sm text-slate-400">
-                          {order.phone && <p>{order.phone}</p>}
-                          {order.email && <p>{order.email}</p>}
-                          {order.address && <p>{order.address}</p>}
-                          {order.notes && (
-                            <p className="text-slate-500">Note: {order.notes}</p>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-3">
-                        <span className="text-lg font-bold text-emerald-400">
-                          {formatPrice(order.total_amount)}
-                        </span>
-                        <select
-                          value={order.status}
-                          onChange={(e) =>
-                            updateOrderStatus(
-                              order,
-                              e.target.value as OrderStatus,
-                            )
-                          }
-                          className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-1.5 text-sm focus:border-emerald-500 focus:outline-none"
-                        >
-                          {ORDER_STATUSES.map((status) => (
-                            <option key={status} value={status}>
-                              {status}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-
-                    {order.order_items && order.order_items.length > 0 && (
-                      <ul className="mt-4 space-y-1 border-t border-slate-800/50 pt-3 text-sm">
-                        {order.order_items.map((item) => (
-                          <li
-                            key={item.id}
-                            className="flex justify-between gap-3 text-slate-300"
-                          >
-                            <span>
-                              {productName(item.product_id)} × {item.quantity}
-                            </span>
-                            <span className="text-slate-400">
-                              {formatPrice(item.unit_price * item.quantity)}
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-          </section>
-        )}
-      </main>
-    </div>
+              <OrderList
+                orders={orders}
+                products={products}
+                onStatusChange={updateOrderStatus}
+                statusUpdating={statusUpdating}
+              />
+            </section>
+          )}
+        </>
+      )}
+    </AdminLayout>
   )
 }
