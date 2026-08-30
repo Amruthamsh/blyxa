@@ -11,6 +11,8 @@ import ProductTable from '../components/admin/ProductTable'
 import OrderList from '../components/admin/OrderList'
 import { Skeleton } from '../components/LoadingState'
 import Button from '../components/Button'
+import { validateProductForm } from '../lib/validation'
+import type { ProductFormErrors } from '../lib/validation'
 
 const PRODUCT_IMAGE_BUCKET = 'product-images'
 
@@ -35,6 +37,7 @@ export default function Admin() {
   const [showAddProduct, setShowAddProduct] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [productForm, setProductForm] = useState(emptyProductForm)
+  const [productFieldErrors, setProductFieldErrors] = useState<ProductFormErrors>({})
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [saving, setSaving] = useState(false)
   const [statusUpdating, setStatusUpdating] = useState(false)
@@ -93,6 +96,7 @@ export default function Admin() {
   function startCreate() {
     setEditingProduct(null)
     setProductForm(emptyProductForm)
+    setProductFieldErrors({})
     setImageFile(null)
     setError(null)
     setShowAddProduct(true)
@@ -108,6 +112,7 @@ export default function Admin() {
       stock: String(product.stock),
       is_active: product.is_active,
     })
+    setProductFieldErrors({})
     setImageFile(null)
     setError(null)
     setShowAddProduct(true)
@@ -117,6 +122,7 @@ export default function Admin() {
   function cancelForm() {
     setEditingProduct(null)
     setProductForm(emptyProductForm)
+    setProductFieldErrors({})
     setImageFile(null)
     setShowAddProduct(false)
   }
@@ -143,13 +149,12 @@ export default function Admin() {
 
   async function submitProduct(event: FormEvent) {
     event.preventDefault()
+    const fieldErrors = validateProductForm(productForm)
+    setProductFieldErrors(fieldErrors)
+    if (Object.keys(fieldErrors).length > 0) return
+
     const price = parseFloat(productForm.price)
     const stock = parseInt(productForm.stock, 10) || 0
-    if (!productForm.name.trim() || Number.isNaN(price) || price < 0) {
-      setError('Please provide a plant name and a valid price.')
-      return
-    }
-
     if (!editingProduct && !imageFile) {
       setError('Please upload a product image. A product must have a photo.')
       return
@@ -223,6 +228,11 @@ export default function Admin() {
 
   function updateProductForm(field: keyof typeof emptyProductForm, value: string | boolean) {
     setProductForm((prev) => ({ ...prev, [field]: value }))
+    setProductFieldErrors((prev) =>
+      prev[field as keyof ProductFormErrors]
+        ? { ...prev, [field as keyof ProductFormErrors]: undefined }
+        : prev,
+    )
   }
 
   async function handleLogout() {
@@ -306,6 +316,7 @@ export default function Admin() {
                     required={!editingProduct}
                     saving={saving}
                     error={error}
+                    fieldErrors={productFieldErrors}
                     onFieldChange={updateProductForm}
                     onImageChange={setImageFile}
                     onSubmit={submitProduct}

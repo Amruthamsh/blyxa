@@ -5,11 +5,19 @@ import { supabase } from '../lib/supabase'
 import { isAdminUser } from '../lib/admin'
 import Logo from '../components/Logo'
 import Button from '../components/Button'
+import { Input } from '../components/Input'
+import { LIMITS, isEmailValid } from '../lib/validation'
+
+interface LoginFieldErrors {
+  email?: string
+  password?: string
+}
 
 export default function Login() {
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [fieldErrors, setFieldErrors] = useState<LoginFieldErrors>({})
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -27,6 +35,21 @@ export default function Login() {
 
   async function handleLogin(event: FormEvent) {
     event.preventDefault()
+
+    const errors: LoginFieldErrors = {}
+    if (!email.trim()) {
+      errors.email = 'Please enter your email address.'
+    } else if (!isEmailValid(email)) {
+      errors.email = 'Please enter a valid email address.'
+    } else if (email.length > LIMITS.email) {
+      errors.email = `Email must be ${LIMITS.email} characters or fewer.`
+    }
+    if (!password) {
+      errors.password = 'Please enter your password.'
+    }
+    setFieldErrors(errors)
+    if (Object.keys(errors).length > 0) return
+
     setLoading(true)
     setError(null)
 
@@ -97,42 +120,39 @@ export default function Login() {
           </p>
 
           <form onSubmit={handleLogin} className="mt-8 space-y-4" noValidate>
-            <div>
-              <label
-                htmlFor="email"
-                className="mb-1.5 block text-sm font-medium text-forest-900"
-              >
-                Email
-              </label>
-              <input
-                id="email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                autoComplete="email"
-                className="w-full rounded-xl border border-forest-900/15 bg-white px-4 py-3 text-sm text-forest-950 shadow-sm placeholder:text-forest-900/35 transition-colors focus:border-moss-500 focus:outline-none focus:ring-2 focus:ring-moss-500/25"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="password"
-                className="mb-1.5 block text-sm font-medium text-forest-900"
-              >
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Your password"
-                autoComplete="current-password"
-                className="w-full rounded-xl border border-forest-900/15 bg-white px-4 py-3 text-sm text-forest-950 shadow-sm placeholder:text-forest-900/35 transition-colors focus:border-moss-500 focus:outline-none focus:ring-2 focus:ring-moss-500/25"
-              />
-            </div>
+            <Input
+              label="Email"
+              id="email"
+              type="email"
+              required
+              autoComplete="email"
+              placeholder="you@example.com"
+              value={email}
+              maxLength={LIMITS.email}
+              error={fieldErrors.email}
+              onChange={(e) => {
+                setEmail(e.target.value)
+                setFieldErrors((prev) =>
+                  prev.email ? { ...prev, email: undefined } : prev,
+                )
+              }}
+            />
+            <Input
+              label="Password"
+              id="password"
+              type="password"
+              required
+              autoComplete="current-password"
+              placeholder="Your password"
+              value={password}
+              error={fieldErrors.password}
+              onChange={(e) => {
+                setPassword(e.target.value)
+                setFieldErrors((prev) =>
+                  prev.password ? { ...prev, password: undefined } : prev,
+                )
+              }}
+            />
 
             {error && (
               <div

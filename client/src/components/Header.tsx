@@ -50,6 +50,20 @@ export default function Header({ cartCount, onOpenCart, onNavigate }: HeaderProp
         <div className="hidden items-center gap-8 md:flex">
           <button
             type="button"
+            onClick={() => goTo('introduction')}
+            className="text-sm font-medium text-forest-900/70 transition-colors hover:text-forest-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-moss-500 rounded"
+          >
+            Introduction
+          </button>
+          <button
+            type="button"
+            onClick={() => goTo('categories')}
+            className="text-sm font-medium text-forest-900/70 transition-colors hover:text-forest-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-moss-500 rounded"
+          >
+            Categories
+          </button>
+          <button
+            type="button"
             onClick={() => goTo('products')}
             className="text-sm font-medium text-forest-900/70 transition-colors hover:text-forest-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-moss-500 rounded"
           >
@@ -129,7 +143,7 @@ export default function Header({ cartCount, onOpenCart, onNavigate }: HeaderProp
       {menuOpen && (
         <div className="border-t border-forest-900/10 bg-sand-50 px-4 py-4 md:hidden">
           <div className="flex flex-col gap-1">
-            {(['products', 'about', 'contact'] as const).map((section) => (
+            {(['introduction', 'categories', 'products', 'about', 'contact'] as const).map((section) => (
               <button
                 key={section}
                 type="button"

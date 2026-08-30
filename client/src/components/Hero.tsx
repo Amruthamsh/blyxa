@@ -12,7 +12,7 @@ export default function Hero({ onShop, onDiscuss }: HeroProps) {
       <div className="mx-auto grid max-w-7xl gap-10 px-4 pt-8 pb-8 sm:px-6 lg:grid-cols-2 lg:items-center lg:gap-16 lg:pt-14 lg:pb-10 lg:px-8">
         <div className="max-w-xl">
           <p className="mb-4 text-sm font-semibold uppercase tracking-[0.25em] text-moss-600">
-            Handcrafted botanicals
+            Blyxa Enterprises · Native &amp; Unique Species
           </p>
           <h1 className="font-serif text-4xl font-medium leading-[1.08] tracking-tight text-forest-950 sm:text-5xl lg:text-[3.5rem]">
             Bring a little
@@ -20,8 +20,9 @@ export default function Hero({ onShop, onDiscuss }: HeroProps) {
             more <em className="italic text-moss-600">green</em> home.
           </h1>
           <p className="mt-5 max-w-md text-base leading-relaxed text-forest-900/60">
-            Thoughtfully grown, carefully potted plants delivered healthy to
-            your doorstep — with personal care advice from our plant people.
+            A conservation-driven collection of native plants — from medicinal
+            herbs and tree saplings to lab specimens and kitchen-garden
+            seedlings — grown with patience and delivered with care.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <Button variant="primary" size="lg" onClick={onShop}>

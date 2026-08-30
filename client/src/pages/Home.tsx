@@ -39,6 +39,39 @@ function formatPhone(phone: string): string {
 
 const DETAILS_STORAGE_KEY = "checkout-details";
 
+const CATEGORIES = [
+  {
+    title: "Medicinal Plants",
+    description:
+      "Traditional and native medicinal species conserved for biodiversity, research and everyday wellness.",
+    icon: "🌿",
+  },
+  {
+    title: "Tree Saplings",
+    description:
+      "Native tree saplings for restoration, campuses, farms, avenues and urban greening.",
+    icon: "🌳",
+  },
+  {
+    title: "Plants for Biology Laboratories",
+    description:
+      "Reliable, correctly identified specimens for schools, colleges and research labs.",
+    icon: "🔬",
+  },
+  {
+    title: "Flowering & Ornamental Plants",
+    description:
+      "Seasonal and perennial blooms that bring local colour and pollinator life home.",
+    icon: "🌸",
+  },
+  {
+    title: "Vegetable Plants",
+    description:
+      "Healthy, hardy vegetable seedlings for kitchen gardens, terraces and community plots.",
+    icon: "🥬",
+  },
+] as const;
+
 const emptyDetails: CheckoutDetails = {
   customer_name: "",
   phone: "",
@@ -162,6 +195,13 @@ export default function Home() {
 
   function discussGeneral() {
     openWhatsApp(whatsappNumber, MESSAGES.generalInquiry);
+  }
+
+  function discussCategory(category: string) {
+    openWhatsApp(
+      whatsappNumber,
+      `Hello, I'm interested in ${category} from Blyxa Enterprises. Could you share availability, pricing and care guidance?`,
+    );
   }
 
   function discussCart() {
@@ -298,22 +338,7 @@ export default function Home() {
   }
 
   return (
-    <div
-      id="top"
-      className="relative min-h-screen bg-sand-50 text-forest-950"
-    >
-      <img
-        src="/border-top.png"
-        alt=""
-        aria-hidden="true"
-        className="pointer-events-none absolute top-0 left-0 w-96 opacity-12 sm:w-[30rem] lg:w-[44rem]"
-      />
-      <img
-        src="/border-bottom.png"
-        alt=""
-        aria-hidden="true"
-        className="pointer-events-none absolute bottom-0 right-0 w-96 opacity-12 sm:w-[30rem] lg:w-[44rem]"
-      />
+    <div id="top" className="min-h-screen bg-sand-50 text-forest-950">
       <Header
         cartCount={cartCount}
         onOpenCart={() => setCartOpen(true)}
@@ -325,6 +350,161 @@ export default function Home() {
           onShop={() => navigateTo("products")}
           onDiscuss={discussGeneral}
         />
+
+        {/* Introduction — Blyxa Enterprises vision */}
+        <section
+          id="introduction"
+          className="scroll-mt-20 border-y border-forest-900/10 bg-white"
+        >
+          <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
+            <div className="grid gap-10 lg:grid-cols-12 lg:gap-12">
+              <div className="lg:col-span-7">
+                <p className="mb-3 text-sm font-semibold uppercase tracking-[0.25em] text-moss-600">
+                  Introduction
+                </p>
+                <h2 className="font-serif text-3xl font-medium leading-tight tracking-tight text-forest-950 sm:text-4xl">
+                  Building a living library of native and unique plants.
+                </h2>
+                <div className="mt-6 space-y-4 text-base leading-relaxed text-forest-900/70">
+                  <p>
+                    <span className="font-semibold text-forest-900">
+                      Blyxa Enterprises
+                    </span>{" "}
+                    aims to build a large-scale collection and conservation
+                    network for native and unique plant species. Our long-term
+                    vision is to become a reliable supplier of native plant
+                    resources for biodiversity conservation programmes,
+                    ecological restoration initiatives, research institutions,
+                    educational organisations, and other conservation efforts.
+                  </p>
+                  <p>
+                    We also cater to garden enthusiasts, nature lovers, and
+                    urban gardeners by promoting awareness of unique native
+                    flora and highlighting their important roles within local
+                    ecological niches.
+                  </p>
+                  <p className="rounded-2xl border border-moss-200 bg-moss-50 px-5 py-4 text-sm leading-relaxed text-moss-900">
+                    Through responsible plant collection, conservation,
+                    propagation, and awareness, Blyxa Enterprises strives to
+                    bridge the gap between biodiversity conservation and
+                    everyday appreciation of native plants.
+                  </p>
+                </div>
+              </div>
+              <div className="lg:col-span-5">
+                <div className="rounded-3xl border border-forest-900/10 bg-sand-50 p-6 lg:p-8">
+                  <h3 className="font-serif text-lg font-semibold text-forest-950">
+                    Who we serve
+                  </h3>
+                  <ul className="mt-4 space-y-3 text-sm leading-relaxed text-forest-900/70">
+                    <li className="flex gap-3">
+                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-moss-500" />
+                      <span>
+                        Biodiversity conservation &amp; ecological restoration
+                        programmes
+                      </span>
+                    </li>
+                    <li className="flex gap-3">
+                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-moss-500" />
+                      <span>
+                        Research institutions, universities &amp; schools
+                      </span>
+                    </li>
+                    <li className="flex gap-3">
+                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-moss-500" />
+                      <span>
+                        Garden enthusiasts, nature lovers &amp; urban gardeners
+                      </span>
+                    </li>
+                    <li className="flex gap-3">
+                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-moss-500" />
+                      <span>
+                        Anyone curious about the plants that belong here
+                      </span>
+                    </li>
+                  </ul>
+                  <div className="mt-6 flex flex-wrap gap-2">
+                    {hasNumber ? (
+                      <Button variant="primary" onClick={discussGeneral}>
+                        Talk to our team
+                      </Button>
+                    ) : null}
+                    <Button
+                      variant="secondary"
+                      onClick={() => navigateTo("categories")}
+                    >
+                      Explore categories
+                    </Button>
+                  </div>
+                  <p className="mt-4 text-xs text-forest-900/50">
+                    Have a restoration or lab requirement? Message us on
+                    WhatsApp for bulk &amp; institutional enquiries.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Categories */}
+        <section id="categories" className="scroll-mt-20 bg-sand-50">
+          <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
+            <div className="mx-auto max-w-2xl text-center">
+              <p className="mb-2 text-sm font-semibold uppercase tracking-[0.25em] text-moss-600">
+                What we grow
+              </p>
+              <h2 className="font-serif text-3xl font-medium tracking-tight text-forest-950 sm:text-4xl">
+                Five collections, one native focus
+              </h2>
+              <p className="mt-3 text-base leading-relaxed text-forest-900/60">
+                From conservation-grade saplings to home-garden favourites —
+                each plant is sourced responsibly and grown for health, not just
+                looks.
+              </p>
+            </div>
+
+            <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
+              {CATEGORIES.map((cat) => (
+                <div
+                  key={cat.title}
+                  className="group flex flex-col rounded-2xl border border-forest-900/10 bg-white p-6 transition-shadow hover:shadow-lg hover:shadow-forest-950/5"
+                >
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-moss-50 text-lg ring-1 ring-moss-200">
+                    <span aria-hidden="true">{cat.icon}</span>
+                  </div>
+                  <h3 className="mt-4 font-serif text-lg font-semibold text-forest-950">
+                    {cat.title}
+                  </h3>
+                  <p className="mt-2 flex-1 text-sm leading-relaxed text-forest-900/60">
+                    {cat.description}
+                  </p>
+                  <div className="mt-5 flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => navigateTo("products")}
+                      className="inline-flex flex-1 items-center justify-center rounded-full border border-forest-900/10 bg-sand-50 px-3 py-2 text-xs font-semibold text-forest-900 transition-colors hover:bg-white"
+                    >
+                      Browse
+                    </button>
+                    {hasNumber && (
+                      <button
+                        type="button"
+                        onClick={() => discussCategory(cat.title)}
+                        className="inline-flex flex-1 items-center justify-center gap-1 rounded-full bg-moss-600 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-moss-700"
+                      >
+                        Enquire
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <p className="mt-8 text-center text-xs text-forest-900/40">
+              Looking for something specific? Chat with us — we’ll help you find
+              the right native species for your space or project.
+            </p>
+          </div>
+        </section>
 
         <section
           id="products"
@@ -423,13 +603,15 @@ export default function Home() {
           <div className="flex flex-col items-center justify-between gap-8 md:flex-row md:items-start">
             <div className="text-center md:text-left">
               <p className="font-serif text-lg font-semibold text-forest-950">
-                Blyxa Botanicals
+                Blyxa Enterprises
               </p>
-              <p className="mt-1 text-sm text-forest-900/50">
-                © {new Date().getFullYear()} Blyxa Botanicals. Grown with care.
+              <p className="mt-1 max-w-sm text-sm leading-relaxed text-forest-900/50">
+                A collection &amp; conservation network for native and unique
+                plants — for restoration, research &amp; home gardens.
               </p>
-              <p className="mt-1 text-sm text-forest-900/50">
-                Healthy plants, delivered with love.
+              <p className="mt-2 text-sm text-forest-900/40">
+                © {new Date().getFullYear()} Blyxa Enterprises. Grown with
+                patience, delivered with care.
               </p>
             </div>
 
@@ -486,7 +668,7 @@ export default function Home() {
             <p className="text-xs text-forest-900/40">
               Website & maintenance by{" "}
               <a
-                href="https://github.com/amruthamsh"
+                href="https://www.linkedin.com/in/amruthamsh-a-0573a822a/"
                 target="_blank"
                 rel="noreferrer"
                 className="font-medium text-forest-900/60 underline decoration-moss-400 underline-offset-2 transition-colors hover:text-forest-950"

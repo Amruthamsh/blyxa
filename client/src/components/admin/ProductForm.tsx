@@ -2,6 +2,8 @@ import type { FormEvent } from 'react'
 import Button from '../Button'
 import { Input, TextArea } from '../Input'
 import ImageUploader from './ImageUploader'
+import type { ProductFormErrors } from '../../lib/validation'
+import { LIMITS } from '../../lib/validation'
 
 export interface ProductFormValues {
   name: string
@@ -19,6 +21,7 @@ interface ProductFormProps {
   required?: boolean
   saving: boolean
   error: string | null
+  fieldErrors?: ProductFormErrors
   onFieldChange: (field: keyof ProductFormValues, value: string | boolean) => void
   onImageChange: (file: File | null) => void
   onSubmit: (event: FormEvent) => void
@@ -33,6 +36,7 @@ export default function ProductForm({
   required,
   saving,
   error,
+  fieldErrors,
   onFieldChange,
   onImageChange,
   onSubmit,
@@ -92,6 +96,8 @@ export default function ProductForm({
             value={values.name}
             onChange={(e) => onFieldChange('name', e.target.value)}
             placeholder="e.g. Monstera Deliciosa"
+            maxLength={LIMITS.productName}
+            error={fieldErrors?.name}
           />
 
           <TextArea
@@ -101,6 +107,8 @@ export default function ProductForm({
             value={values.description}
             onChange={(e) => onFieldChange('description', e.target.value)}
             placeholder="A short, friendly description for the plant card"
+            maxLength={LIMITS.productDescription}
+            error={fieldErrors?.description}
           />
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -109,20 +117,24 @@ export default function ProductForm({
               type="number"
               required
               min="0"
+              max={LIMITS.price}
               step="0.01"
               value={values.price}
               onChange={(e) => onFieldChange('price', e.target.value)}
               placeholder="0.00"
+              error={fieldErrors?.price}
             />
             <Input
               label="Stock"
               type="number"
               required
               min="0"
+              max={LIMITS.stock}
               step="1"
               value={values.stock}
               onChange={(e) => onFieldChange('stock', e.target.value)}
               placeholder="0"
+              error={fieldErrors?.stock}
             />
           </div>
 

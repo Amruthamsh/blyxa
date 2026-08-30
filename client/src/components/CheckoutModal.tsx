@@ -6,6 +6,7 @@ import Button from './Button'
 import { Input, TextArea } from './Input'
 import { Stepper } from './CartDrawer'
 import { WhatsAppIcon } from './CartDrawer'
+import { LIMITS, isEmailValid, isPhoneValid } from '../lib/validation'
 
 export interface CheckoutLineItem {
   product: Product
@@ -61,12 +62,22 @@ export default function CheckoutModal({
     event.preventDefault()
     const errors: Partial<CheckoutDetails> = {}
     if (!form.customer_name.trim()) errors.customer_name = 'Please enter your name.'
+    else if (form.customer_name.length > LIMITS.customerName)
+      errors.customer_name = `Name must be ${LIMITS.customerName} characters or fewer.`
     if (!form.phone.trim()) errors.phone = 'Please enter your phone number.'
-    else if (!/^[+\d][\d\s-]{7,14}$/.test(form.phone.trim()))
-      errors.phone = 'Please enter a valid phone number.'
-    if (form.email && !/^\S+@\S+\.\S+$/.test(form.email.trim()))
-      errors.email = 'Please enter a valid email address.'
+    else if (!isPhoneValid(form.phone))
+      errors.phone = 'Please enter a valid 10-digit phone number.'
+    if (form.email.trim()) {
+      if (!isEmailValid(form.email))
+        errors.email = 'Please enter a valid email address.'
+      else if (form.email.length > LIMITS.email)
+        errors.email = `Email must be ${LIMITS.email} characters or fewer.`
+    }
     if (!form.address.trim()) errors.address = 'Please enter your delivery address.'
+    else if (form.address.length > LIMITS.address)
+      errors.address = `Address must be ${LIMITS.address} characters or fewer.`
+    if (form.notes.length > LIMITS.notes)
+      errors.notes = `Notes must be ${LIMITS.notes} characters or fewer.`
     setFieldErrors(errors)
     if (Object.keys(errors).length > 0) return
     onSubmit(event)
@@ -142,6 +153,7 @@ export default function CheckoutModal({
                 onChange={(e) => updateField('customer_name', e.target.value)}
                 placeholder="Your full name"
                 autoComplete="name"
+                maxLength={LIMITS.customerName}
                 error={fieldErrors.customer_name}
               />
               <Input
@@ -152,6 +164,8 @@ export default function CheckoutModal({
                 onChange={(e) => updateField('phone', e.target.value)}
                 placeholder="Your phone number"
                 autoComplete="tel"
+                inputMode="numeric"
+                maxLength={LIMITS.phone}
                 error={fieldErrors.phone}
               />
               <Input
@@ -162,6 +176,7 @@ export default function CheckoutModal({
                 onChange={(e) => updateField('email', e.target.value)}
                 placeholder="you@example.com"
                 autoComplete="email"
+                maxLength={LIMITS.email}
                 error={fieldErrors.email}
               />
               <Input
@@ -171,6 +186,7 @@ export default function CheckoutModal({
                 onChange={(e) => updateField('address', e.target.value)}
                 placeholder="Delivery address"
                 autoComplete="street-address"
+                maxLength={LIMITS.address}
                 error={fieldErrors.address}
               />
               <TextArea
@@ -178,8 +194,10 @@ export default function CheckoutModal({
                 optional
                 rows={2}
                 value={form.notes}
-                onChange={(e) => onUpdateForm('notes', e.target.value)}
+                onChange={(e) => updateField('notes', e.target.value)}
                 placeholder="Any special instructions"
+                maxLength={LIMITS.notes}
+                error={fieldErrors.notes}
               />
             </div>
           </section>
