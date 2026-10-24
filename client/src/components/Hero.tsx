@@ -51,15 +51,12 @@ export default function Hero({ onShop, onDiscuss }: HeroProps) {
           </span> */}
 
           <h1 className="mt-6 font-serif text-[2.6rem] font-medium leading-[1.03] tracking-tight text-forest-950 sm:text-5xl lg:text-[3.6rem]">
-            A calm collection
-            <br />
-            of <em className="italic text-moss-600">living</em> things.
+            A little closer to <em className="italic text-moss-600">Nature</em>
           </h1>
 
-          <p className="mt-6 max-w-lg text-base leading-relaxed text-forest-900/65">
-            Native saplings, gentle herbs and garden companions — hand-raised in
-            our nursery and waiting to settle into your home. Come wander the
-            collection. Take your time.
+          <p className="mt-6 max-w-lg text-base leading-relaxed text-forest-900/85">
+            Blyxa Plant Nursery offers a variety of plants, saplings, and herbs,
+            along with customized plant gifting for every occasion.
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -69,11 +66,11 @@ export default function Hero({ onShop, onDiscuss }: HeroProps) {
               onClick={onShop}
               className="group gap-2.5"
             >
-              Explore the collection
+              Explore our plants
               <ArrowIcon />
             </Button>
             <Button variant="secondary" size="lg" onClick={onDiscuss}>
-              Say hello
+              Get in touch
             </Button>
           </div>
 
@@ -83,7 +80,7 @@ export default function Hero({ onShop, onDiscuss }: HeroProps) {
                 Grown
               </dt>
               <dd className="mt-1.5 text-sm font-semibold text-forest-900">
-                With patience
+                With care
               </dd>
             </div>
             <div>
@@ -91,7 +88,7 @@ export default function Hero({ onShop, onDiscuss }: HeroProps) {
                 Sourced
               </dt>
               <dd className="mt-1.5 text-sm font-semibold text-forest-900">
-                Native &amp; unique
+                Native &amp; distinct
               </dd>
             </div>
             <div>
