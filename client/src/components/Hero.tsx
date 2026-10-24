@@ -43,26 +43,26 @@ export default function Hero({ onShop, onDiscuss }: HeroProps) {
         <div className="absolute left-1/2 top-1/3 h-px w-40 -translate-x-1/2 bg-gradient-to-r from-transparent via-moss-300/40 to-transparent" />
       </div>
 
-      <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-14 px-4 pb-16 pt-12 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-20 lg:px-8 lg:pb-24 lg:pt-20">
+      <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-9 px-4 pb-12 pt-10 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16 lg:px-8 lg:pb-16 lg:pt-12">
         <div className="min-w-0 max-w-xl">
           {/* <span className="inline-flex items-center gap-2.5 rounded-full border border-moss-200/80 bg-white/70 px-4 py-1.5 text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-moss-700 shadow-sm shadow-moss-900/5 backdrop-blur">
             <span className="h-1.5 w-1.5 rounded-full bg-moss-500" />
             Blyxa Plants Nursery
           </span> */}
 
-          <h1 className="mt-6 font-serif text-[2.85rem] font-medium leading-[1.03] tracking-tight text-forest-950 sm:text-6xl lg:text-[4.1rem]">
+          <h1 className="mt-6 font-serif text-[2.6rem] font-medium leading-[1.03] tracking-tight text-forest-950 sm:text-5xl lg:text-[3.6rem]">
             A calm collection
             <br />
             of <em className="italic text-moss-600">living</em> things.
           </h1>
 
-          <p className="mt-6 max-w-lg text-base leading-relaxed text-forest-900/65 sm:text-lg">
+          <p className="mt-6 max-w-lg text-base leading-relaxed text-forest-900/65">
             Native saplings, gentle herbs and garden companions — hand-raised in
             our nursery and waiting to settle into your home. Come wander the
             collection. Take your time.
           </p>
 
-          <div className="mt-9 flex flex-wrap items-center gap-3">
+          <div className="mt-8 flex flex-wrap items-center gap-3">
             <Button
               variant="primary"
               size="lg"
@@ -77,7 +77,7 @@ export default function Hero({ onShop, onDiscuss }: HeroProps) {
             </Button>
           </div>
 
-          <dl className="mt-11 grid max-w-md grid-cols-3 gap-5 border-t border-forest-900/10 pt-6">
+          <dl className="mt-8 grid max-w-md grid-cols-3 gap-5 border-t border-forest-900/10 pt-5">
             <div>
               <dt className="text-[0.68rem] font-semibold uppercase tracking-wider text-forest-900/40">
                 Grown
@@ -105,12 +105,12 @@ export default function Hero({ onShop, onDiscuss }: HeroProps) {
           </dl>
         </div>
 
-        <div className="relative mx-auto w-full min-w-0 max-w-full sm:max-w-[430px] lg:max-w-none">
+        <div className="relative mx-auto w-full min-w-0 max-w-full sm:max-w-[450px] lg:max-w-[440px]">
           <div
             aria-hidden="true"
             className="absolute -inset-4 rounded-[3.25rem] bg-gradient-to-br from-moss-200/50 via-white/40 to-sand-200/60 blur-2xl"
           />
-          <div className="relative overflow-hidden rounded-[2.75rem] border border-white/80 bg-white p-3 shadow-[0_36px_90px_-38px_rgba(26,40,34,0.42)] sm:p-4">
+          <div className="relative overflow-hidden rounded-[2.75rem] border border-white/80 bg-white p-2.5 shadow-[0_36px_90px_-38px_rgba(26,40,34,0.42)] sm:p-3">
             <div className="overflow-hidden rounded-[2.1rem] bg-sand-50">
               <img
                 src="/logo1.jpeg"
