@@ -48,7 +48,7 @@ export default function Header({ showCart, cartCount, onOpenCart, onNavigate }: 
           <Logo />
         </a>
 
-        <div className="hidden items-center gap-8 md:flex">
+        <div className="ml-auto hidden items-center gap-8 md:flex">
           <button
             type="button"
             onClick={() => goTo('products')}
@@ -86,7 +86,7 @@ export default function Header({ showCart, cartCount, onOpenCart, onNavigate }: 
           </button>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 md:pl-10">
           {showCart && (
             <button
               type="button"

@@ -357,7 +357,7 @@ export default function Home() {
         {/* The collection — front and centre */}
         <section id="products" className="relative scroll-mt-24">
           <div className="relative mx-auto max-w-7xl px-4 pb-16 pt-4 sm:px-6 lg:px-8 lg:pb-24 lg:pt-8">
-            <div className="relative mb-10 overflow-hidden rounded-[2.5rem] border border-forest-900/10 bg-gradient-to-br from-moss-50 via-white to-sand-100 px-6 py-9 sm:px-10 lg:mb-14 lg:px-14 lg:py-12">
+            {/* <div className="relative mb-10 overflow-hidden rounded-[2.5rem] border border-forest-900/10 bg-gradient-to-br from-moss-50 via-white to-sand-100 px-6 py-9 sm:px-10 lg:mb-14 lg:px-14 lg:py-12">
               <div
                 aria-hidden="true"
                 className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-moss-200/40 blur-3xl"
@@ -370,9 +370,7 @@ export default function Home() {
                   </p>
                   <h2 className="mt-4 font-serif text-4xl font-medium leading-[1.05] tracking-tight text-forest-950 sm:text-5xl">
                     Meet the plants{" "}
-                    <em className="italic text-moss-600">
-                      ready to come home
-                    </em>
+                    <em className="italic text-moss-600">ready to come home</em>
                     .
                   </h2>
                   <p className="mt-4 text-base leading-relaxed text-forest-900/60">
@@ -396,7 +394,7 @@ export default function Home() {
                   ) : null}
                 </div>
               </div>
-            </div>
+            </div> */}
 
             <ProductGrid
               products={products}
@@ -509,7 +507,7 @@ export default function Home() {
         </section>
 
         {/* Categories */}
-        <section id="categories" className="scroll-mt-24 bg-sand-100/60">
+        {/* <section id="categories" className="scroll-mt-24 bg-sand-100/60">
           <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
             <div className="mx-auto max-w-2xl text-center">
               <p className="mb-2 text-xs font-semibold uppercase tracking-[0.28em] text-moss-600">
@@ -566,7 +564,7 @@ export default function Home() {
               help you find the right native species for your space or project.
             </p>
           </div>
-        </section>
+        </section> */}
 
         <section id="about" className="scroll-mt-24">
           <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
@@ -594,9 +592,10 @@ export default function Home() {
                 <div className="flex flex-col justify-center">
                   <div className="space-y-4 text-base leading-relaxed text-forest-900/65">
                     <p>
-                      Every plant is handpicked, inspected and potted by our team
-                      before it makes its way to you. We keep the range small and
-                      the quality high, so each plant arrives ready to settle in.
+                      Every plant is handpicked, inspected and potted by our
+                      team before it makes its way to you. We keep the range
+                      small and the quality high, so each plant arrives ready to
+                      settle in.
                     </p>
                     <p>
                       Each order comes with care guidance, and our plant people
