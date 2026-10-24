@@ -3,6 +3,7 @@ import type { FormEvent } from "react";
 import { supabase } from "../lib/supabase";
 import type { Product } from "../lib/types";
 import { formatPrice } from "../lib/format";
+import { CART_AND_ORDERS_ENABLED } from "../lib/features";
 import {
   MESSAGES,
   buildDiscussionMessage,
@@ -340,6 +341,7 @@ export default function Home() {
   return (
     <div id="top" className="min-h-screen bg-sand-50 text-forest-950">
       <Header
+        showCart={CART_AND_ORDERS_ENABLED}
         cartCount={cartCount}
         onOpenCart={() => setCartOpen(true)}
         onNavigate={navigateTo}
@@ -532,6 +534,7 @@ export default function Home() {
             loading={loading}
             error={error}
             cart={cart}
+            commerceEnabled={CART_AND_ORDERS_ENABLED}
             canDiscuss={hasNumber}
             onAddToCart={addToCart}
             onOrderNow={orderNow}
@@ -680,7 +683,7 @@ export default function Home() {
         </div>
       </footer>
 
-      {toast && (
+      {CART_AND_ORDERS_ENABLED && toast && (
         <div className="pointer-events-none fixed bottom-6 left-1/2 z-[70] w-[calc(100%-2rem)] max-w-sm -translate-x-1/2">
           <Toast
             toast={toast}
@@ -692,7 +695,7 @@ export default function Home() {
         </div>
       )}
 
-      {orderPlaced && (
+      {CART_AND_ORDERS_ENABLED && orderPlaced && (
         <div
           role="status"
           aria-live="polite"
@@ -761,37 +764,41 @@ export default function Home() {
         </div>
       )}
 
-      <CartDrawer
-        open={cartOpen}
-        items={cartItems}
-        quantities={cart}
-        total={cartTotal}
-        canDiscuss={hasNumber}
-        onClose={() => setCartOpen(false)}
-        onAdjust={adjustCartQuantity}
-        onRemove={removeFromCart}
-        onCheckout={openCartCheckout}
-        onDiscuss={discussCart}
-        onExplore={() => {
-          setCartOpen(false);
-          navigateTo("products");
-        }}
-      />
+      {CART_AND_ORDERS_ENABLED && (
+        <>
+          <CartDrawer
+            open={cartOpen}
+            items={cartItems}
+            quantities={cart}
+            total={cartTotal}
+            canDiscuss={hasNumber}
+            onClose={() => setCartOpen(false)}
+            onAdjust={adjustCartQuantity}
+            onRemove={removeFromCart}
+            onCheckout={openCartCheckout}
+            onDiscuss={discussCart}
+            onExplore={() => {
+              setCartOpen(false);
+              navigateTo("products");
+            }}
+          />
 
-      <CheckoutModal
-        open={checkoutOpen}
-        items={checkoutItems}
-        total={checkoutTotal}
-        form={form}
-        submitting={submitting}
-        error={checkoutError}
-        canDiscuss={hasNumber}
-        onClose={() => setCheckoutOpen(false)}
-        onUpdateForm={updateForm}
-        onAdjust={adjustCheckoutItem}
-        onSubmit={handlePlaceOrder}
-        onDiscuss={discussCheckout}
-      />
+          <CheckoutModal
+            open={checkoutOpen}
+            items={checkoutItems}
+            total={checkoutTotal}
+            form={form}
+            submitting={submitting}
+            error={checkoutError}
+            canDiscuss={hasNumber}
+            onClose={() => setCheckoutOpen(false)}
+            onUpdateForm={updateForm}
+            onAdjust={adjustCheckoutItem}
+            onSubmit={handlePlaceOrder}
+            onDiscuss={discussCheckout}
+          />
+        </>
+      )}
     </div>
   );
 }

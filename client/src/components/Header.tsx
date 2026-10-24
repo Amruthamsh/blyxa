@@ -2,12 +2,13 @@ import { useEffect, useState } from 'react'
 import Logo from './Logo'
 
 interface HeaderProps {
+  showCart: boolean
   cartCount: number
   onOpenCart: () => void
   onNavigate: (section: string) => void
 }
 
-export default function Header({ cartCount, onOpenCart, onNavigate }: HeaderProps) {
+export default function Header({ showCart, cartCount, onOpenCart, onNavigate }: HeaderProps) {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
 
@@ -86,33 +87,35 @@ export default function Header({ cartCount, onOpenCart, onNavigate }: HeaderProp
         </div>
 
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={onOpenCart}
-            className="relative inline-flex h-11 w-11 items-center justify-center rounded-full text-forest-900 transition-colors hover:bg-moss-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-moss-500"
-            aria-label={`Open cart, ${cartCount} ${cartCount === 1 ? 'item' : 'items'}`}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5.5 w-5.5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={1.7}
-              aria-hidden="true"
+          {showCart && (
+            <button
+              type="button"
+              onClick={onOpenCart}
+              className="relative inline-flex h-11 w-11 items-center justify-center rounded-full text-forest-900 transition-colors hover:bg-moss-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-moss-500"
+              aria-label={`Open cart, ${cartCount} ${cartCount === 1 ? 'item' : 'items'}`}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
-              />
-            </svg>
-            {cartCount > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-moss-600 px-1 text-[0.7rem] font-bold text-sand-50">
-                {cartCount}
-              </span>
-            )}
-          </button>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5.5 w-5.5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={1.7}
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
+                />
+              </svg>
+              {cartCount > 0 && (
+                <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-moss-600 px-1 text-[0.7rem] font-bold text-sand-50">
+                  {cartCount}
+                </span>
+              )}
+            </button>
+          )}
 
           <button
             type="button"

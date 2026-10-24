@@ -56,18 +56,21 @@ Full-stack e-commerce application for **Blyxa**, a plant nursery. It pairs a Rea
 ### Storefront (`/`)
 
 - Hero, product collection, about, and contact sections
-- Product grid with live stock indicators ("Out of stock", "Only 1 left", "All in your cart")
-- Shopping cart drawer with quantity steppers and per-item totals
-- Checkout modal with client-side form validation
-- WhatsApp deep links to discuss a plant, a cart, an order, or general inquiries
-- Toast notifications and an order confirmation banner
-- Checkout details persisted to `localStorage`
+- Product grid with live stock indicators ("Out of stock", "Only 1 left")
+- WhatsApp deep links to enquire about a plant, a cart, an order, or general topics
+- Optional cart, checkout, and order confirmation flows (feature-flagged)
 
 ### Admin (`/login`, `/admin`)
 
 - Email/password sign-in via Supabase Auth, restricted to users in the `admin_users` table
 - Product management: create, edit, activate/deactivate, upload product images
-- Order management: view orders with line items and update status (`new` → `confirmed` → `processing` → `completed` / `cancelled`)
+- Optional order management: view orders with line items and update status (`new` → `confirmed` → `processing` → `completed` / `cancelled`)
+
+### Feature flags
+
+Cart, checkout, and order management are controlled by `VITE_ENABLE_CART_AND_ORDERS`.
+It defaults to `false`, so the storefront is enquiry-only via WhatsApp and the admin
+dashboard manages plants only. Set it to `true` to enable the full commerce flow.
 
 ### Backend
 
@@ -102,6 +105,7 @@ VITE_SUPABASE_ANON_KEY=your-anon-key
 VITE_WHATSAPP_NUMBER=your-whatsapp-number
 VITE_CONTACT_EMAIL=your-email
 VITE_CONTACT_PHONE=your-phone
+VITE_ENABLE_CART_AND_ORDERS=false
 ```
 
 ### 3. Run locally

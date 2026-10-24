@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { CART_AND_ORDERS_ENABLED } from '../lib/features'
 import { isAdminUser } from '../lib/admin'
 import type { Order, OrderStatus, Product } from '../lib/types'
 import AdminLayout from '../components/admin/AdminLayout'
@@ -65,26 +66,28 @@ export default function Admin() {
   async function fetchData() {
     setLoading(true)
     setError(null)
-    const [productResult, orderResult] = await Promise.all([
-      supabase
-        .from('products')
-        .select('*')
-        .order('created_at', { ascending: false }),
-      supabase
-        .from('orders')
-        .select('*, order_items(*)')
-        .order('created_at', { ascending: false }),
-    ])
+    const productResult = await supabase
+      .from('products')
+      .select('*')
+      .order('created_at', { ascending: false })
 
     if (productResult.error) {
       setError(productResult.error.message)
     } else {
       setProducts(productResult.data ?? [])
     }
-    if (orderResult.error) {
-      setError(orderResult.error.message)
-    } else {
-      setOrders(orderResult.data ?? [])
+
+    if (CART_AND_ORDERS_ENABLED) {
+      const orderResult = await supabase
+        .from('orders')
+        .select('*, order_items(*)')
+        .order('created_at', { ascending: false })
+
+      if (orderResult.error) {
+        setError(orderResult.error.message)
+      } else {
+        setOrders(orderResult.data ?? [])
+      }
     }
     setLoading(false)
   }
@@ -252,6 +255,7 @@ export default function Admin() {
 
   return (
     <AdminLayout
+      showOrders={CART_AND_ORDERS_ENABLED}
       activeView={tab}
       onNavigate={(view) => {
         setTab(view)
@@ -333,7 +337,7 @@ export default function Admin() {
                 />
               )}
             </section>
-          ) : (
+          ) : CART_AND_ORDERS_ENABLED ? (
             <section>
               <div className="mb-6">
                 <h3 className="font-serif text-3xl font-medium tracking-tight text-forest-950">
@@ -351,7 +355,7 @@ export default function Admin() {
                 statusUpdating={statusUpdating}
               />
             </section>
-          )}
+          ) : null}
         </>
       )}
     </AdminLayout>

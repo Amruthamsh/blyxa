@@ -9,6 +9,7 @@ interface ProductGridProps {
   loading: boolean
   error: string | null
   cart: Record<string, number>
+  commerceEnabled: boolean
   canDiscuss: boolean
   onAddToCart: (product: Product) => void
   onOrderNow: (product: Product) => void
@@ -21,6 +22,7 @@ export default function ProductGrid({
   loading,
   error,
   cart,
+  commerceEnabled,
   canDiscuss,
   onAddToCart,
   onOrderNow,
@@ -64,6 +66,7 @@ export default function ProductGrid({
           product={product}
           cartQty={cart[product.id] ?? 0}
           inCart={Boolean(cart[product.id])}
+          commerceEnabled={commerceEnabled}
           onAddToCart={onAddToCart}
           onOrderNow={onOrderNow}
           onDiscuss={onDiscuss}
