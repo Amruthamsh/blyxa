@@ -23,6 +23,7 @@ import type {
 } from "../components/CheckoutModal";
 import Toast from "../components/Toast";
 import Button from "../components/Button";
+import Logo from "../components/Logo";
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
@@ -353,19 +354,78 @@ export default function Home() {
           onDiscuss={discussGeneral}
         />
 
+        {/* The collection — front and centre */}
+        <section id="products" className="relative scroll-mt-24">
+          <div className="relative mx-auto max-w-7xl px-4 pb-16 pt-4 sm:px-6 lg:px-8 lg:pb-24 lg:pt-8">
+            <div className="relative mb-10 overflow-hidden rounded-[2.5rem] border border-forest-900/10 bg-gradient-to-br from-moss-50 via-white to-sand-100 px-6 py-9 sm:px-10 lg:mb-14 lg:px-14 lg:py-12">
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-moss-200/40 blur-3xl"
+              />
+              <div className="relative flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+                <div className="max-w-2xl">
+                  <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.28em] text-moss-600">
+                    <span className="h-px w-8 bg-moss-400/70" />
+                    The collection
+                  </p>
+                  <h2 className="mt-4 font-serif text-4xl font-medium leading-[1.05] tracking-tight text-forest-950 sm:text-5xl">
+                    Meet the plants{" "}
+                    <em className="italic text-moss-600">
+                      ready to come home
+                    </em>
+                    .
+                  </h2>
+                  <p className="mt-4 text-base leading-relaxed text-forest-900/60">
+                    A slowly grown, ever-changing gathering of native and unique
+                    species. Browse what&rsquo;s in the nursery right now — we
+                    are always happy to help you find a good match.
+                  </p>
+                </div>
+                <div className="flex shrink-0 flex-wrap items-center gap-3">
+                  {!loading && !error && products.length > 0 && (
+                    <span className="inline-flex items-center gap-2 rounded-full border border-moss-200 bg-white/80 px-4 py-2 text-xs font-semibold text-moss-700">
+                      <span className="h-1.5 w-1.5 rounded-full bg-moss-500" />
+                      {products.length}{" "}
+                      {products.length === 1 ? "plant" : "plants"} available
+                    </span>
+                  )}
+                  {hasNumber ? (
+                    <Button variant="secondary" onClick={discussGeneral}>
+                      Ask a question
+                    </Button>
+                  ) : null}
+                </div>
+              </div>
+            </div>
+
+            <ProductGrid
+              products={products}
+              loading={loading}
+              error={error}
+              cart={cart}
+              commerceEnabled={CART_AND_ORDERS_ENABLED}
+              canDiscuss={hasNumber}
+              onAddToCart={addToCart}
+              onOrderNow={orderNow}
+              onDiscuss={discussProduct}
+              onRetry={fetchProducts}
+            />
+          </div>
+        </section>
+
         {/* Introduction — Blyxa Enterprises vision */}
         <section
           id="introduction"
-          className="scroll-mt-20 border-y border-forest-900/10 bg-white"
+          className="scroll-mt-24 border-y border-forest-900/10 bg-white"
         >
-          <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
-            <div className="grid gap-10 lg:grid-cols-12 lg:gap-12">
+          <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
+            <div className="grid gap-10 lg:grid-cols-12 lg:gap-14">
               <div className="lg:col-span-7">
-                <p className="mb-3 text-sm font-semibold uppercase tracking-[0.25em] text-moss-600">
-                  Introduction
+                <p className="mb-3 text-xs font-semibold uppercase tracking-[0.28em] text-moss-600">
+                  Our story
                 </p>
                 <h2 className="font-serif text-3xl font-medium leading-tight tracking-tight text-forest-950 sm:text-4xl">
-                  Building a living library of native and unique plants.
+                  A living library, grown slowly and shared warmly.
                 </h2>
                 <div className="mt-6 space-y-4 text-base leading-relaxed text-forest-900/70">
                   <p>
@@ -449,14 +509,14 @@ export default function Home() {
         </section>
 
         {/* Categories */}
-        <section id="categories" className="scroll-mt-20 bg-sand-50">
-          <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
+        <section id="categories" className="scroll-mt-24 bg-sand-100/60">
+          <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
             <div className="mx-auto max-w-2xl text-center">
-              <p className="mb-2 text-sm font-semibold uppercase tracking-[0.25em] text-moss-600">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.28em] text-moss-600">
                 What we grow
               </p>
               <h2 className="font-serif text-3xl font-medium tracking-tight text-forest-950 sm:text-4xl">
-                Five collections, one native focus
+                Five plant families, one native heart
               </h2>
               <p className="mt-3 text-base leading-relaxed text-forest-900/60">
                 From conservation-grade saplings to home-garden favourites —
@@ -465,16 +525,16 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
+            <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
               {CATEGORIES.map((cat) => (
                 <div
                   key={cat.title}
-                  className="group flex flex-col rounded-2xl border border-forest-900/10 bg-white p-6 transition-shadow hover:shadow-lg hover:shadow-forest-950/5"
+                  className="group flex flex-col rounded-3xl border border-forest-900/10 bg-white p-7 shadow-sm shadow-forest-950/[0.03] transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-forest-950/[0.07]"
                 >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-moss-50 text-lg ring-1 ring-moss-200">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-moss-100 to-sand-100 text-2xl ring-1 ring-moss-200/70">
                     <span aria-hidden="true">{cat.icon}</span>
                   </div>
-                  <h3 className="mt-4 font-serif text-lg font-semibold text-forest-950">
+                  <h3 className="mt-5 font-serif text-xl font-semibold leading-snug text-forest-950">
                     {cat.title}
                   </h3>
                   <p className="mt-2 flex-1 text-sm leading-relaxed text-forest-900/60">
@@ -484,9 +544,9 @@ export default function Home() {
                     <button
                       type="button"
                       onClick={() => navigateTo("products")}
-                      className="inline-flex flex-1 items-center justify-center rounded-full border border-forest-900/10 bg-sand-50 px-3 py-2 text-xs font-semibold text-forest-900 transition-colors hover:bg-white"
+                      className="inline-flex flex-1 items-center justify-center rounded-full border border-forest-900/10 bg-sand-50 px-3 py-2 text-xs font-semibold text-forest-900 transition-colors hover:bg-moss-50"
                     >
-                      Browse
+                      Browse the collection
                     </button>
                     {hasNumber && (
                       <button
@@ -501,99 +561,106 @@ export default function Home() {
                 </div>
               ))}
             </div>
-            <p className="mt-8 text-center text-xs text-forest-900/40">
-              Looking for something specific? Chat with us — we’ll help you find
-              the right native species for your space or project.
+            <p className="mt-10 text-center text-sm text-forest-900/45">
+              Looking for something specific? Chat with us — we would love to
+              help you find the right native species for your space or project.
             </p>
           </div>
         </section>
 
-        <section
-          id="products"
-          className="mx-auto max-w-7xl scroll-mt-20 px-4 pt-8 pb-14 sm:px-6 lg:px-8 lg:pt-10 lg:pb-20"
-        >
-          <div className="mb-8 flex items-end justify-between gap-4 lg:mb-12">
-            <div>
-              <p className="mb-2 text-sm font-semibold uppercase tracking-[0.25em] text-moss-600">
-                The collection
-              </p>
-              <h2 className="font-serif text-3xl font-medium tracking-tight text-forest-950 sm:text-4xl">
-                Plants for your space
-              </h2>
-            </div>
-            {!loading && !error && products.length > 0 && (
-              <p className="hidden text-sm text-forest-900/50 sm:block">
-                {products.length} {products.length === 1 ? "plant" : "plants"}{" "}
-                available
-              </p>
-            )}
-          </div>
-
-          <ProductGrid
-            products={products}
-            loading={loading}
-            error={error}
-            cart={cart}
-            commerceEnabled={CART_AND_ORDERS_ENABLED}
-            canDiscuss={hasNumber}
-            onAddToCart={addToCart}
-            onOrderNow={orderNow}
-            onDiscuss={discussProduct}
-            onRetry={fetchProducts}
-          />
-        </section>
-
-        <section
-          id="about"
-          className="border-y border-forest-900/10 bg-white/60"
-        >
-          <div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-8 lg:py-24">
-            <div>
-              <p className="mb-2 text-sm font-semibold uppercase tracking-[0.25em] text-moss-600">
-                About Blyxa
-              </p>
-              <h2 className="font-serif text-3xl font-medium tracking-tight text-forest-950 sm:text-4xl">
-                Grown with patience, delivered with care.
-              </h2>
-            </div>
-            <div className="space-y-4 text-base leading-relaxed text-forest-900/65">
-              <p>
-                Blyxa is a small plant studio built around a simple idea — that
-                a healthy plant can change the feeling of a room. Every plant is
-                handpicked, inspected and potted by our team before it ships.
-              </p>
-              <p>
-                We keep the range small and the quality high. Each order comes
-                with plant care guidance, and our plant people are a message
-                away on WhatsApp whenever you need a hand.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        <section id="contact" className="scroll-mt-20">
-          <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
-            <div className="flex flex-col items-start justify-between gap-8 rounded-3xl bg-forest-900 px-8 py-10 sm:px-12 lg:flex-row lg:items-center">
-              <div className="max-w-lg">
-                <h2 className="font-serif text-3xl font-medium tracking-tight text-sand-50">
-                  Not sure which plant is right for you?
-                </h2>
-                <p className="mt-3 text-base leading-relaxed text-sand-50/70">
-                  Tell us about your light, your space and your routine. We’ll
-                  recommend a plant that will actually thrive with you.
-                </p>
+        <section id="about" className="scroll-mt-24">
+          <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
+            <div className="relative overflow-hidden rounded-[2.5rem] border border-forest-900/10 bg-gradient-to-br from-moss-50 via-white to-sand-100">
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute -bottom-24 -left-16 h-64 w-64 rounded-full bg-moss-200/40 blur-3xl"
+              />
+              <div className="relative grid gap-10 p-8 sm:p-12 lg:grid-cols-2 lg:gap-16 lg:p-16">
+                <div>
+                  <p className="mb-3 text-xs font-semibold uppercase tracking-[0.28em] text-moss-600">
+                    About Blyxa
+                  </p>
+                  <h2 className="font-serif text-3xl font-medium leading-tight tracking-tight text-forest-950 sm:text-4xl lg:text-[2.75rem]">
+                    Grown with patience,
+                    <br />
+                    delivered with care.
+                  </h2>
+                  <p className="mt-5 max-w-md text-base leading-relaxed text-forest-900/60">
+                    A small plant studio with a simple belief — that a healthy
+                    plant can gently change the feeling of a room, a garden, or
+                    an afternoon.
+                  </p>
+                </div>
+                <div className="flex flex-col justify-center">
+                  <div className="space-y-4 text-base leading-relaxed text-forest-900/65">
+                    <p>
+                      Every plant is handpicked, inspected and potted by our team
+                      before it makes its way to you. We keep the range small and
+                      the quality high, so each plant arrives ready to settle in.
+                    </p>
+                    <p>
+                      Each order comes with care guidance, and our plant people
+                      are only a message away whenever you need a little help.
+                    </p>
+                  </div>
+                  <div className="mt-7 flex flex-wrap gap-2">
+                    {[
+                      "Handpicked",
+                      "Eco-friendly packaging",
+                      "Care guidance",
+                      "A message away",
+                    ].map((label) => (
+                      <span
+                        key={label}
+                        className="rounded-full border border-moss-200 bg-white/80 px-3.5 py-1.5 text-xs font-semibold text-moss-700"
+                      >
+                        {label}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               </div>
-              {hasNumber && (
-                <Button
-                  variant="whatsapp"
-                  size="lg"
-                  onClick={discussGeneral}
-                  className="bg-emerald-50 text-emerald-900 hover:bg-emerald-100"
-                >
-                  <WhatsAppIcon />
-                  Chat with us on WhatsApp
-                </Button>
-              )}
+            </div>
+          </div>
+        </section>
+
+        <section id="contact" className="scroll-mt-24">
+          <div className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8 lg:pb-24">
+            <div className="relative overflow-hidden rounded-[2.5rem] bg-forest-900 px-8 py-12 sm:px-12 lg:px-16 lg:py-16">
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full bg-moss-700/40 blur-3xl"
+              />
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute -bottom-24 left-1/3 h-56 w-56 rounded-full bg-moss-800/50 blur-3xl"
+              />
+              <div className="relative flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-center">
+                <div className="max-w-xl">
+                  <p className="mb-3 text-xs font-semibold uppercase tracking-[0.28em] text-moss-300">
+                    Let&rsquo;s find your green companion
+                  </p>
+                  <h2 className="font-serif text-3xl font-medium leading-tight tracking-tight text-sand-50 sm:text-4xl">
+                    Not sure which plant is right for you?
+                  </h2>
+                  <p className="mt-3 text-base leading-relaxed text-sand-50/70">
+                    Tell us about your light, your space and your routine. We
+                    will happily recommend a plant that will actually thrive
+                    with you.
+                  </p>
+                </div>
+                {hasNumber && (
+                  <Button
+                    variant="whatsapp"
+                    size="lg"
+                    onClick={discussGeneral}
+                    className="shrink-0 bg-emerald-50 text-emerald-900 hover:bg-emerald-100"
+                  >
+                    <WhatsAppIcon />
+                    Say hello on WhatsApp
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
         </section>
@@ -601,14 +668,20 @@ export default function Home() {
         <SocialMedia />
       </main>
 
-      <footer className="border-t border-forest-900/10">
-        <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+      <footer className="relative overflow-hidden border-t border-forest-900/10">
+        <img
+          src="/border-bottom.png"
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute -bottom-8 right-0 w-[min(760px,85vw)] max-w-none select-none opacity-[0.18] mix-blend-multiply"
+        />
+        <div className="relative mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
           <div className="flex flex-col items-center justify-between gap-8 md:flex-row md:items-start">
             <div className="text-center md:text-left">
-              <p className="font-serif text-lg font-semibold text-forest-950">
-                Blyxa Enterprises
-              </p>
-              <p className="mt-1 max-w-sm text-sm leading-relaxed text-forest-900/50">
+              <div className="flex justify-center md:justify-start">
+                <Logo />
+              </div>
+              <p className="mt-3 max-w-sm text-sm leading-relaxed text-forest-900/50">
                 A collection &amp; conservation network for native and unique
                 plants — for restoration, research &amp; home gardens.
               </p>

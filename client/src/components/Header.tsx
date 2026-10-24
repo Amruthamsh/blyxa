@@ -51,10 +51,17 @@ export default function Header({ showCart, cartCount, onOpenCart, onNavigate }: 
         <div className="hidden items-center gap-8 md:flex">
           <button
             type="button"
+            onClick={() => goTo('products')}
+            className="text-sm font-medium text-forest-900/70 transition-colors hover:text-forest-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-moss-500 rounded"
+          >
+            Collection
+          </button>
+          <button
+            type="button"
             onClick={() => goTo('introduction')}
             className="text-sm font-medium text-forest-900/70 transition-colors hover:text-forest-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-moss-500 rounded"
           >
-            Introduction
+            Our story
           </button>
           <button
             type="button"
@@ -62,13 +69,6 @@ export default function Header({ showCart, cartCount, onOpenCart, onNavigate }: 
             className="text-sm font-medium text-forest-900/70 transition-colors hover:text-forest-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-moss-500 rounded"
           >
             Categories
-          </button>
-          <button
-            type="button"
-            onClick={() => goTo('products')}
-            className="text-sm font-medium text-forest-900/70 transition-colors hover:text-forest-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-moss-500 rounded"
-          >
-            Shop
           </button>
           <button
             type="button"
@@ -146,14 +146,18 @@ export default function Header({ showCart, cartCount, onOpenCart, onNavigate }: 
       {menuOpen && (
         <div className="border-t border-forest-900/10 bg-sand-50 px-4 py-4 md:hidden">
           <div className="flex flex-col gap-1">
-            {(['introduction', 'categories', 'products', 'about', 'contact'] as const).map((section) => (
+            {(['products', 'introduction', 'categories', 'about', 'contact'] as const).map((section) => (
               <button
                 key={section}
                 type="button"
                 onClick={() => goTo(section)}
                 className="rounded-lg px-3 py-3 text-left text-base font-medium capitalize text-forest-900 transition-colors hover:bg-moss-100"
               >
-                {section === 'products' ? 'Shop' : section}
+                {section === 'products'
+                  ? 'Collection'
+                  : section === 'introduction'
+                    ? 'Our story'
+                    : section}
               </button>
             ))}
           </div>

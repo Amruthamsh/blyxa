@@ -37,18 +37,18 @@ export default function ProductCard({
 
   return (
     <article
-      className={`group flex flex-col overflow-hidden rounded-2xl border bg-white transition-shadow duration-200 hover:shadow-lg hover:shadow-forest-950/5 ${
+      className={`group flex flex-col overflow-hidden rounded-3xl border bg-white transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-forest-950/[0.07] ${
         inCart ? 'border-moss-500/50' : 'border-forest-900/10'
       }`}
     >
-      <div className="relative aspect-[2/3] overflow-hidden bg-moss-100">
+      <div className="relative aspect-[4/5] overflow-hidden bg-gradient-to-b from-moss-50 to-moss-100">
         {product.image_url ? (
           <img
             src={product.image_url}
             alt={product.name}
             loading="lazy"
             decoding="async"
-            className="h-full w-full object-cover transition-transform duration-300 ease-out group-hover:scale-[1.03]"
+            className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
           />
         ) : (
           <div className="flex h-full items-center justify-center text-sm text-forest-900/40">
@@ -68,24 +68,24 @@ export default function ProductCard({
         )}
       </div>
 
-      <div className="flex flex-1 flex-col p-5">
-        <h3 className="font-serif text-lg font-semibold leading-snug text-forest-950">
+      <div className="flex flex-1 flex-col p-5 sm:p-6">
+        <h3 className="font-serif text-lg font-semibold leading-snug text-forest-950 sm:text-xl">
           {product.name}
         </h3>
         {(product.botanical_name || product.family) && (
-          <p className="mt-0.5 text-xs italic text-forest-900/45">
+          <p className="mt-1 text-xs italic text-forest-900/45">
             {[product.botanical_name, product.family]
               .filter(Boolean)
               .join(' · ')}
           </p>
         )}
         {product.description && (
-          <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-forest-900/55">
+          <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-forest-900/55">
             {product.description}
           </p>
         )}
 
-        <div className="mt-4 flex items-baseline justify-between">
+        <div className="mt-4 flex items-baseline justify-between gap-2">
           <p className="text-lg font-bold text-forest-950">
             {formatPrice(product.price)}
           </p>
