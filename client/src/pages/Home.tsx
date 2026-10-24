@@ -370,9 +370,7 @@ export default function Home() {
                   </p>
                   <h2 className="mt-4 font-serif text-4xl font-medium leading-[1.05] tracking-tight text-forest-950 sm:text-5xl">
                     Meet the plants{" "}
-                    <em className="italic text-moss-600">
-                      ready to come home
-                    </em>
+                    <em className="italic text-moss-600">ready to come home</em>
                     .
                   </h2>
                   <p className="mt-4 text-base leading-relaxed text-forest-900/60">
@@ -509,7 +507,7 @@ export default function Home() {
         </section>
 
         {/* Categories */}
-        <section id="categories" className="scroll-mt-24 bg-sand-100/60">
+        {/* <section id="categories" className="scroll-mt-24 bg-sand-100/60">
           <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
             <div className="mx-auto max-w-2xl text-center">
               <p className="mb-2 text-xs font-semibold uppercase tracking-[0.28em] text-moss-600">
@@ -566,7 +564,7 @@ export default function Home() {
               help you find the right native species for your space or project.
             </p>
           </div>
-        </section>
+        </section> */}
 
         <section id="about" className="scroll-mt-24">
           <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
