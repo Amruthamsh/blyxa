@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { CART_AND_ORDERS_ENABLED } from '../lib/features'
 import { isAdminUser } from '../lib/admin'
 import type { Order, OrderStatus, Product } from '../lib/types'
 import AdminLayout from '../components/admin/AdminLayout'
@@ -18,7 +19,19 @@ const PRODUCT_IMAGE_BUCKET = 'product-images'
 
 const emptyProductForm: ProductFormValues = {
   name: '',
+  botanical_name: '',
+  family: '',
+  plant_type: '',
   description: '',
+  light: '',
+  water: '',
+  potting_mix: '',
+  maintenance: '',
+  common_pests: '',
+  common_diseases: '',
+  traditional_uses: '',
+  propagation: '',
+  safety_note: '',
   price: '',
   stock: '0',
   is_active: true,
@@ -65,26 +78,28 @@ export default function Admin() {
   async function fetchData() {
     setLoading(true)
     setError(null)
-    const [productResult, orderResult] = await Promise.all([
-      supabase
-        .from('products')
-        .select('*')
-        .order('created_at', { ascending: false }),
-      supabase
-        .from('orders')
-        .select('*, order_items(*)')
-        .order('created_at', { ascending: false }),
-    ])
+    const productResult = await supabase
+      .from('products')
+      .select('*')
+      .order('created_at', { ascending: false })
 
     if (productResult.error) {
       setError(productResult.error.message)
     } else {
       setProducts(productResult.data ?? [])
     }
-    if (orderResult.error) {
-      setError(orderResult.error.message)
-    } else {
-      setOrders(orderResult.data ?? [])
+
+    if (CART_AND_ORDERS_ENABLED) {
+      const orderResult = await supabase
+        .from('orders')
+        .select('*, order_items(*)')
+        .order('created_at', { ascending: false })
+
+      if (orderResult.error) {
+        setError(orderResult.error.message)
+      } else {
+        setOrders(orderResult.data ?? [])
+      }
     }
     setLoading(false)
   }
@@ -107,7 +122,19 @@ export default function Admin() {
     setEditingProduct(product)
     setProductForm({
       name: product.name,
+      botanical_name: product.botanical_name ?? '',
+      family: product.family ?? '',
+      plant_type: product.plant_type ?? '',
       description: product.description ?? '',
+      light: product.light ?? '',
+      water: product.water ?? '',
+      potting_mix: product.potting_mix ?? '',
+      maintenance: product.maintenance ?? '',
+      common_pests: product.common_pests ?? '',
+      common_diseases: product.common_diseases ?? '',
+      traditional_uses: product.traditional_uses ?? '',
+      propagation: product.propagation ?? '',
+      safety_note: product.safety_note ?? '',
       price: String(product.price),
       stock: String(product.stock),
       is_active: product.is_active,
@@ -153,11 +180,32 @@ export default function Admin() {
     setProductFieldErrors(fieldErrors)
     if (Object.keys(fieldErrors).length > 0) return
 
+    const textOrNull = (value: string) => value.trim() || null
     const price = parseFloat(productForm.price)
     const stock = parseInt(productForm.stock, 10) || 0
     if (!editingProduct && !imageFile) {
       setError('Please upload a product image. A product must have a photo.')
       return
+    }
+
+    const productFields = {
+      name: productForm.name.trim(),
+      botanical_name: textOrNull(productForm.botanical_name),
+      family: textOrNull(productForm.family),
+      plant_type: textOrNull(productForm.plant_type),
+      description: textOrNull(productForm.description),
+      light: textOrNull(productForm.light),
+      water: textOrNull(productForm.water),
+      potting_mix: textOrNull(productForm.potting_mix),
+      maintenance: textOrNull(productForm.maintenance),
+      common_pests: textOrNull(productForm.common_pests),
+      common_diseases: textOrNull(productForm.common_diseases),
+      traditional_uses: textOrNull(productForm.traditional_uses),
+      propagation: textOrNull(productForm.propagation),
+      safety_note: textOrNull(productForm.safety_note),
+      price,
+      stock,
+      is_active: productForm.is_active,
     }
 
     setSaving(true)
@@ -173,12 +221,8 @@ export default function Admin() {
         const { error } = await supabase
           .from('products')
           .update({
-            name: productForm.name.trim(),
-            description: productForm.description.trim() || null,
-            price,
-            stock,
+            ...productFields,
             image_url: imageUrl,
-            is_active: productForm.is_active,
           })
           .eq('id', editingProduct.id)
 
@@ -189,12 +233,8 @@ export default function Admin() {
 
         const { error } = await supabase.from('products').insert({
           id: productId,
-          name: productForm.name.trim(),
-          description: productForm.description.trim() || null,
-          price,
-          stock,
+          ...productFields,
           image_url: imageUrl,
-          is_active: productForm.is_active,
         })
 
         if (error) throw error
@@ -252,6 +292,7 @@ export default function Admin() {
 
   return (
     <AdminLayout
+      showOrders={CART_AND_ORDERS_ENABLED}
       activeView={tab}
       onNavigate={(view) => {
         setTab(view)
@@ -333,7 +374,7 @@ export default function Admin() {
                 />
               )}
             </section>
-          ) : (
+          ) : CART_AND_ORDERS_ENABLED ? (
             <section>
               <div className="mb-6">
                 <h3 className="font-serif text-3xl font-medium tracking-tight text-forest-950">
@@ -351,7 +392,7 @@ export default function Admin() {
                 statusUpdating={statusUpdating}
               />
             </section>
-          )}
+          ) : null}
         </>
       )}
     </AdminLayout>

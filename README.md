@@ -47,6 +47,7 @@ Full-stack e-commerce application for **Blyxa**, a plant nursery. It pairs a Rea
 ├── server/supabase/functions/       # Supabase Edge Functions (Deno)
 │   └── create-order/                # Validates + places orders, decrements stock
 ├── supabase/                        # SQL migrations/setup
+│   ├── add_product_details.sql      # Botanical, care, pest, and safety fields
 │   └── rls_products.sql             # Row-level security policies for products
 └── wrangler.jsonc                   # Cloudflare deployment config
 ```
@@ -56,18 +57,24 @@ Full-stack e-commerce application for **Blyxa**, a plant nursery. It pairs a Rea
 ### Storefront (`/`)
 
 - Hero, product collection, about, and contact sections
-- Product grid with live stock indicators ("Out of stock", "Only 1 left", "All in your cart")
-- Shopping cart drawer with quantity steppers and per-item totals
-- Checkout modal with client-side form validation
-- WhatsApp deep links to discuss a plant, a cart, an order, or general inquiries
-- Toast notifications and an order confirmation banner
-- Checkout details persisted to `localStorage`
+- Product grid with live stock indicators ("Out of stock", "Only 1 left")
+- WhatsApp deep links to enquire about a plant, a cart, an order, or general topics
+- Optional cart, checkout, and order confirmation flows (feature-flagged)
 
 ### Admin (`/login`, `/admin`)
 
 - Email/password sign-in via Supabase Auth, restricted to users in the `admin_users` table
 - Product management: create, edit, activate/deactivate, upload product images
-- Order management: view orders with line items and update status (`new` → `confirmed` → `processing` → `completed` / `cancelled`)
+- Images are resized to a maximum of 1600 × 2400 and compressed in the browser before upload
+- Plant detail fields: botanical name, family, plant type, light, water, potting mix, maintenance, common pests, common diseases, traditional uses, propagation, and safety notes
+- Word (.docx) import: choose a plant information document to autofill labelled fields in the browser; the file is not uploaded or stored, and fields can be reviewed before saving
+- Optional order management: view orders with line items and update status (`new` → `confirmed` → `processing` → `completed` / `cancelled`)
+
+### Feature flags
+
+Cart, checkout, and order management are controlled by `VITE_ENABLE_CART_AND_ORDERS`.
+It defaults to `false`, so the storefront is enquiry-only via WhatsApp and the admin
+dashboard manages plants only. Set it to `true` to enable the full commerce flow.
 
 ### Backend
 
@@ -82,7 +89,8 @@ Full-stack e-commerce application for **Blyxa**, a plant nursery. It pairs a Rea
 
 1. Create a Supabase project and run the setup SQL (see `supabase/rls_products.sql` and the schema implied by `client/src/lib/types.ts`).
 2. Create tables: `products`, `orders`, `order_items`, `admin_users`.
-3. Create the `product-images` storage bucket (public).
+3. Run `supabase/add_product_details.sql` to add the plant detail columns to `products`.
+4. Create the `product-images` storage bucket (public).
 4. Deploy the edge function:
 
 ```bash
@@ -102,6 +110,7 @@ VITE_SUPABASE_ANON_KEY=your-anon-key
 VITE_WHATSAPP_NUMBER=your-whatsapp-number
 VITE_CONTACT_EMAIL=your-email
 VITE_CONTACT_PHONE=your-phone
+VITE_ENABLE_CART_AND_ORDERS=false
 ```
 
 ### 3. Run locally

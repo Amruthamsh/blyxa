@@ -3,6 +3,7 @@ import Logo from '../Logo'
 import Button from '../Button'
 
 interface AdminLayoutProps {
+  showOrders: boolean
   onNavigate: (view: 'products' | 'orders') => void
   activeView: 'products' | 'orders'
   onLogout: () => void
@@ -10,15 +11,18 @@ interface AdminLayoutProps {
 }
 
 export default function AdminLayout({
+  showOrders,
   onNavigate,
   activeView,
   onLogout,
   children,
 }: AdminLayoutProps) {
-  const navItems = [
-    { id: 'products' as const, label: 'Products' },
-    { id: 'orders' as const, label: 'Orders' },
+  const navItems: { id: 'products' | 'orders'; label: string }[] = [
+    { id: 'products', label: 'Products' },
   ]
+  if (showOrders) {
+    navItems.push({ id: 'orders', label: 'Orders' })
+  }
 
   return (
     <div className="min-h-screen bg-sand-50 text-forest-950">
