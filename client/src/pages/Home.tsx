@@ -41,39 +41,6 @@ function formatPhone(phone: string): string {
 
 const DETAILS_STORAGE_KEY = "checkout-details";
 
-// const CATEGORIES = [
-//   {
-//     title: "Medicinal Plants",
-//     description:
-//       "Traditional and native medicinal species conserved for biodiversity, research and everyday wellness.",
-//     icon: "🌿",
-//   },
-//   {
-//     title: "Tree Saplings",
-//     description:
-//       "Native tree saplings for restoration, campuses, farms, avenues and urban greening.",
-//     icon: "🌳",
-//   },
-//   {
-//     title: "Plants for Biology Laboratories",
-//     description:
-//       "Reliable, correctly identified specimens for schools, colleges and research labs.",
-//     icon: "🔬",
-//   },
-//   {
-//     title: "Flowering & Ornamental Plants",
-//     description:
-//       "Seasonal and perennial blooms that bring local colour and pollinator life home.",
-//     icon: "🌸",
-//   },
-//   {
-//     title: "Vegetable Plants",
-//     description:
-//       "Healthy, hardy vegetable seedlings for kitchen gardens, terraces and community plots.",
-//     icon: "🥬",
-//   },
-// ] as const;
-
 const emptyDetails: CheckoutDetails = {
   customer_name: "",
   phone: "",
@@ -198,13 +165,6 @@ export default function Home() {
   function discussGeneral() {
     openWhatsApp(whatsappNumber, MESSAGES.generalInquiry);
   }
-
-  // function discussCategory(category: string) {
-  //   openWhatsApp(
-  //     whatsappNumber,
-  //     `Hello, I'm interested in ${category} from Blyxa Enterprises. Could you share availability, pricing and care guidance?`,
-  //   );
-  // }
 
   function discussCart() {
     const lines = cartItems.map(
