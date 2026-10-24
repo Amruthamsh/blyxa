@@ -47,6 +47,7 @@ Full-stack e-commerce application for **Blyxa**, a plant nursery. It pairs a Rea
 ├── server/supabase/functions/       # Supabase Edge Functions (Deno)
 │   └── create-order/                # Validates + places orders, decrements stock
 ├── supabase/                        # SQL migrations/setup
+│   ├── add_product_details.sql      # Botanical, care, pest, and safety fields
 │   └── rls_products.sql             # Row-level security policies for products
 └── wrangler.jsonc                   # Cloudflare deployment config
 ```
@@ -64,6 +65,8 @@ Full-stack e-commerce application for **Blyxa**, a plant nursery. It pairs a Rea
 
 - Email/password sign-in via Supabase Auth, restricted to users in the `admin_users` table
 - Product management: create, edit, activate/deactivate, upload product images
+- Plant detail fields: botanical name, family, plant type, light, water, potting mix, maintenance, common pests, common diseases, traditional uses, propagation, and safety notes
+- Word (.docx) import: choose a plant information document to autofill labelled fields in the browser; the file is not uploaded or stored, and fields can be reviewed before saving
 - Optional order management: view orders with line items and update status (`new` → `confirmed` → `processing` → `completed` / `cancelled`)
 
 ### Feature flags
@@ -85,7 +88,8 @@ dashboard manages plants only. Set it to `true` to enable the full commerce flow
 
 1. Create a Supabase project and run the setup SQL (see `supabase/rls_products.sql` and the schema implied by `client/src/lib/types.ts`).
 2. Create tables: `products`, `orders`, `order_items`, `admin_users`.
-3. Create the `product-images` storage bucket (public).
+3. Run `supabase/add_product_details.sql` to add the plant detail columns to `products`.
+4. Create the `product-images` storage bucket (public).
 4. Deploy the edge function:
 
 ```bash

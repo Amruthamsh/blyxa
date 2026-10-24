@@ -66,6 +66,13 @@ export default function ProductTable({ products, onEdit, onAdd }: ProductTablePr
                       <p className="max-w-[15rem] truncate font-semibold text-forest-950">
                         {product.name}
                       </p>
+                      {(product.botanical_name || product.family) && (
+                        <p className="max-w-[15rem] truncate text-xs italic text-forest-900/45">
+                          {[product.botanical_name, product.family]
+                            .filter(Boolean)
+                            .join(' · ')}
+                        </p>
+                      )}
                       <p className="max-w-[15rem] truncate text-xs text-forest-900/50">
                         {product.description || 'No description'}
                       </p>
@@ -126,6 +133,13 @@ export default function ProductTable({ products, onEdit, onAdd }: ProductTablePr
               <p className="truncate font-semibold text-forest-950">
                 {product.name}
               </p>
+              {(product.botanical_name || product.family) && (
+                <p className="truncate text-xs italic text-forest-900/45">
+                  {[product.botanical_name, product.family]
+                    .filter(Boolean)
+                    .join(' · ')}
+                </p>
+              )}
               <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-forest-900/60">
                 <span className="font-bold text-forest-950">
                   {formatPrice(product.price)}

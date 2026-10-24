@@ -41,7 +41,7 @@ export default function ProductCard({
         inCart ? 'border-moss-500/50' : 'border-forest-900/10'
       }`}
     >
-      <div className="relative aspect-square overflow-hidden bg-moss-100">
+      <div className="relative aspect-[2/3] overflow-hidden bg-moss-100">
         {product.image_url ? (
           <img
             src={product.image_url}
@@ -72,6 +72,13 @@ export default function ProductCard({
         <h3 className="font-serif text-lg font-semibold leading-snug text-forest-950">
           {product.name}
         </h3>
+        {(product.botanical_name || product.family) && (
+          <p className="mt-0.5 text-xs italic text-forest-900/45">
+            {[product.botanical_name, product.family]
+              .filter(Boolean)
+              .join(' · ')}
+          </p>
+        )}
         {product.description && (
           <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-forest-900/55">
             {product.description}

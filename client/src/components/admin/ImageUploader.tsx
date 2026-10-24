@@ -76,7 +76,7 @@ export default function ImageUploader({
 
       {showCurrent && (
         <div>
-          <div className="relative aspect-square w-44 overflow-hidden rounded-2xl border border-forest-900/10">
+          <div className="relative aspect-[2/3] w-44 overflow-hidden rounded-2xl border border-forest-900/10">
             {currentImageUrl ? (
               <img
                 src={currentImageUrl}
@@ -112,7 +112,7 @@ export default function ImageUploader({
 
       {value && previewUrl && (
         <div>
-          <div className="relative aspect-square w-44 overflow-hidden rounded-2xl border-2 border-moss-500/60">
+          <div className="relative aspect-[2/3] w-44 overflow-hidden rounded-2xl border-2 border-moss-500/60">
             <img
               src={previewUrl}
               alt="New product image preview"
@@ -168,7 +168,7 @@ export default function ImageUploader({
             }
           }}
           aria-label="Upload product image"
-          className={`flex aspect-square w-44 cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed p-4 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-moss-500 ${
+          className={`flex aspect-[2/3] w-44 cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed p-4 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-moss-500 ${
             dragging
               ? 'border-moss-500 bg-moss-50'
               : 'border-forest-900/20 bg-white hover:border-moss-500 hover:bg-moss-50'
