@@ -1,17 +1,25 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { DragEvent } from 'react'
+import { optimizeImage } from '../../lib/imageOptimization'
 
 const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/avif']
-const MAX_SIZE_MB = 8
+const MAX_SOURCE_SIZE_MB = 40
 
 function validateImage(file: File): string | null {
   if (!ACCEPTED_TYPES.includes(file.type)) {
     return 'Please choose a JPG, PNG, WebP or AVIF image.'
   }
-  if (file.size > MAX_SIZE_MB * 1024 * 1024) {
-    return `Image is too large. Maximum size is ${MAX_SIZE_MB}MB.`
+  if (file.size > MAX_SOURCE_SIZE_MB * 1024 * 1024) {
+    return `Original image is too large. Maximum size is ${MAX_SOURCE_SIZE_MB}MB.`
   }
   return null
+}
+
+function formatSize(bytes: number): string {
+  if (bytes < 1024 * 1024) {
+    return `${Math.max(1, Math.round(bytes / 1024))} KB`
+  }
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
 interface ImageUploaderProps {
@@ -36,27 +44,66 @@ export default function ImageUploader({
   const inputRef = useRef<HTMLInputElement>(null)
   const [dragging, setDragging] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [processing, setProcessing] = useState(false)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [optimization, setOptimization] = useState<{
+    originalSize: number
+    size: number
+    width: number
+    height: number
+  } | null>(null)
 
   const showCurrent = Boolean(currentImageUrl) && !value
-  const previewUrl = value ? URL.createObjectURL(value) : null
+  const busy = disabled || uploading || processing
 
-  function handleFiles(files: FileList | null) {
+  useEffect(() => {
+    if (!value) {
+      setPreviewUrl(null)
+      return
+    }
+    const url = URL.createObjectURL(value)
+    setPreviewUrl(url)
+    return () => URL.revokeObjectURL(url)
+  }, [value])
+
+  async function handleFiles(files: FileList | null) {
     const file = files?.[0]
     if (!file) return
+
     const validationError = validateImage(file)
     if (validationError) {
       setError(validationError)
+      setOptimization(null)
       onChange(null)
       return
     }
+
     setError(null)
-    onChange(file)
+    setProcessing(true)
+    try {
+      const result = await optimizeImage(file)
+      setOptimization({
+        originalSize: result.originalSize,
+        size: result.file.size,
+        width: result.width,
+        height: result.height,
+      })
+      onChange(result.file)
+    } catch (err) {
+      setOptimization(null)
+      setError(
+        err instanceof Error ? err.message : 'We could not process that image.',
+      )
+      onChange(null)
+    } finally {
+      setProcessing(false)
+    }
   }
 
   function handleDrop(event: DragEvent<HTMLDivElement>) {
     event.preventDefault()
     setDragging(false)
-    if (disabled || uploading) return
+    if (busy) return
     handleFiles(event.dataTransfer.files)
   }
 
@@ -68,6 +115,7 @@ export default function ImageUploader({
         accept={ACCEPTED_TYPES.join(',')}
         className="sr-only"
         aria-hidden="true"
+        disabled={busy}
         onChange={(e) => {
           handleFiles(e.target.files)
           e.target.value = ''
@@ -96,7 +144,7 @@ export default function ImageUploader({
             <button
               type="button"
               onClick={() => inputRef.current?.click()}
-              disabled={disabled || uploading}
+              disabled={busy}
               className="rounded-full border border-forest-900/15 px-4 py-2 text-sm font-semibold text-forest-900 transition-colors hover:bg-moss-50 disabled:opacity-45"
             >
               Replace image
@@ -122,19 +170,30 @@ export default function ImageUploader({
               New image
             </span>
           </div>
+          {optimization && (
+            <p className="mt-2 max-w-[11rem] text-xs leading-relaxed text-forest-900/50">
+              {optimization.width} × {optimization.height} ·{' '}
+              {optimization.originalSize > optimization.size
+                ? `${formatSize(optimization.originalSize)} → ${formatSize(optimization.size)}`
+                : formatSize(optimization.size)}
+            </p>
+          )}
           <div className="mt-3 flex items-center gap-2">
             <button
               type="button"
               onClick={() => inputRef.current?.click()}
-              disabled={disabled || uploading}
+              disabled={busy}
               className="rounded-full border border-forest-900/15 px-4 py-2 text-sm font-semibold text-forest-900 transition-colors hover:bg-moss-50 disabled:opacity-45"
             >
               Replace
             </button>
             <button
               type="button"
-              onClick={() => onChange(null)}
-              disabled={disabled || uploading}
+              onClick={() => {
+                setOptimization(null)
+                onChange(null)
+              }}
+              disabled={busy}
               className="rounded-full px-4 py-2 text-sm font-semibold text-red-600 transition-colors hover:bg-red-50 disabled:opacity-45"
             >
               Remove
@@ -151,11 +210,11 @@ export default function ImageUploader({
       {!showCurrent && !value && (
         <div
           onClick={() => {
-            if (!disabled && !uploading) inputRef.current?.click()
+            if (!busy) inputRef.current?.click()
           }}
           onDragOver={(e) => {
             e.preventDefault()
-            if (!disabled && !uploading) setDragging(true)
+            if (!busy) setDragging(true)
           }}
           onDragLeave={() => setDragging(false)}
           onDrop={handleDrop}
@@ -164,7 +223,7 @@ export default function ImageUploader({
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault()
-              if (!disabled && !uploading) inputRef.current?.click()
+              if (!busy) inputRef.current?.click()
             }
           }}
           aria-label="Upload product image"
@@ -172,7 +231,7 @@ export default function ImageUploader({
             dragging
               ? 'border-moss-500 bg-moss-50'
               : 'border-forest-900/20 bg-white hover:border-moss-500 hover:bg-moss-50'
-          } ${disabled || uploading ? 'cursor-not-allowed opacity-50' : ''}`}
+          } ${busy ? 'cursor-not-allowed opacity-50' : ''}`}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -196,15 +255,24 @@ export default function ImageUploader({
             Drag &amp; drop or click to browse
           </span>
           <span className="text-[0.65rem] text-forest-900/40">
-            JPG, PNG, WebP or AVIF · max 8MB
+            JPG, PNG, WebP or AVIF · original up to 40MB
           </span>
         </div>
       )}
 
+      <p className="mt-2 max-w-[11rem] text-xs leading-relaxed text-forest-900/50">
+        Large photos are resized and compressed automatically before upload.
+      </p>
       {error && (
         <p className="mt-2 text-sm text-red-600" role="alert">
           {error}
         </p>
+      )}
+      {processing && (
+        <div className="mt-3 flex items-center gap-2 text-sm text-forest-900/60">
+          <span className="h-4 w-4 animate-spin rounded-full border-2 border-moss-600/30 border-t-moss-600" aria-hidden="true" />
+          Optimizing image…
+        </div>
       )}
       {uploading && (
         <div className="mt-3 flex items-center gap-2 text-sm text-forest-900/60">

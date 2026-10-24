@@ -65,6 +65,7 @@ Full-stack e-commerce application for **Blyxa**, a plant nursery. It pairs a Rea
 
 - Email/password sign-in via Supabase Auth, restricted to users in the `admin_users` table
 - Product management: create, edit, activate/deactivate, upload product images
+- Images are resized to a maximum of 1600 × 2400 and compressed in the browser before upload
 - Plant detail fields: botanical name, family, plant type, light, water, potting mix, maintenance, common pests, common diseases, traditional uses, propagation, and safety notes
 - Word (.docx) import: choose a plant information document to autofill labelled fields in the browser; the file is not uploaded or stored, and fields can be reviewed before saving
 - Optional order management: view orders with line items and update status (`new` → `confirmed` → `processing` → `completed` / `cancelled`)
