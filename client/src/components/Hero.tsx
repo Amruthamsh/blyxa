@@ -43,7 +43,7 @@ export default function Hero({ onShop, onDiscuss }: HeroProps) {
         <div className="absolute left-1/2 top-1/3 h-px w-40 -translate-x-1/2 bg-gradient-to-r from-transparent via-moss-300/40 to-transparent" />
       </div>
 
-      <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-9 px-4 pb-8 pt-8 sm:px-6 sm:pb-12 sm:pt-10 md:grid-cols-[1.05fr_0.95fr] lg:gap-16 lg:px-8 lg:pb-16 lg:pt-12">
+      <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-9 px-4 pb-8 pt-14 sm:px-6 sm:pb-12 sm:pt-10 md:grid-cols-[1.05fr_0.95fr] lg:gap-16 lg:px-8 lg:pb-16 lg:pt-12">
         <div className="min-w-0 max-w-xl">
           {/* <span className="inline-flex items-center gap-2.5 rounded-full border border-moss-200/80 bg-white/70 px-4 py-1.5 text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-moss-700 shadow-sm shadow-moss-900/5 backdrop-blur">
             <span className="h-1.5 w-1.5 rounded-full bg-moss-500" />
