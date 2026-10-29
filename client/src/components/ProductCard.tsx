@@ -99,7 +99,7 @@ export default function ProductCard({
           </p>
         )}
 
-        <div className="mt-2 flex flex-wrap items-baseline justify-between gap-x-2 gap-y-0.5">
+        <div className="mt-auto flex flex-wrap items-baseline justify-between pt-2 gap-x-2 gap-y-0.5">
           <p className="text-base font-bold text-forest-950 sm:text-lg">
             {formatPrice(product.price)}
           </p>
