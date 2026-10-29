@@ -1,20 +1,20 @@
-import type { Product } from '../lib/types'
-import ProductCard from './ProductCard'
-import { ProductGridSkeleton } from './LoadingState'
-import EmptyState from './EmptyState'
-import Button from './Button'
+import type { Product } from "../lib/types";
+import ProductCard from "./ProductCard";
+import { ProductGridSkeleton } from "./LoadingState";
+import EmptyState from "./EmptyState";
+import Button from "./Button";
 
 interface ProductGridProps {
-  products: Product[]
-  loading: boolean
-  error: string | null
-  cart: Record<string, number>
-  commerceEnabled: boolean
-  canDiscuss: boolean
-  onAddToCart: (product: Product) => void
-  onOrderNow: (product: Product) => void
-  onDiscuss: (product: Product) => void
-  onRetry: () => void
+  products: Product[];
+  loading: boolean;
+  error: string | null;
+  cart: Record<string, number>;
+  commerceEnabled: boolean;
+  canDiscuss: boolean;
+  onAddToCart: (product: Product) => void;
+  onOrderNow: (product: Product) => void;
+  onDiscuss: (product: Product) => void;
+  onRetry: () => void;
 }
 
 export default function ProductGrid({
@@ -29,7 +29,7 @@ export default function ProductGrid({
   onDiscuss,
   onRetry,
 }: ProductGridProps) {
-  if (loading) return <ProductGridSkeleton />
+  if (loading) return <ProductGridSkeleton />;
 
   if (error) {
     return (
@@ -44,7 +44,7 @@ export default function ProductGrid({
           Try again
         </Button>
       </div>
-    )
+    );
   }
 
   if (products.length === 0) {
@@ -52,14 +52,14 @@ export default function ProductGrid({
       <EmptyState
         title="New plants are on the way"
         message="We’re restocking our shelves with fresh, healthy plants. Check back soon to find your next green companion."
-        actionLabel={canDiscuss ? 'Chat on WhatsApp' : undefined}
+        actionLabel={canDiscuss ? "Chat on WhatsApp" : undefined}
         onAction={() => onDiscuss({} as Product)}
       />
-    )
+    );
   }
 
   return (
-    <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 lg:grid-cols-3 lg:gap-x-8 lg:gap-y-14">
+    <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-8 lg:gap-y-14">
       {products.map((product) => (
         <ProductCard
           key={product.id}
@@ -74,5 +74,5 @@ export default function ProductGrid({
         />
       ))}
     </div>
-  )
+  );
 }
