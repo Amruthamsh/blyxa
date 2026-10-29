@@ -55,13 +55,13 @@ export default function SocialMedia() {
           </p>
         </div>
 
-        <div className="grid gap-10 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-2">
           <div
-            className="flex justify-center"
+            className="flex min-w-0 justify-center [&_.instagram-media]:!min-w-0 [&_.instagram-media]:!max-w-full"
             dangerouslySetInnerHTML={{ __html: INSTAGRAM_EMBED_HTML }}
           />
           <div
-            className="flex justify-center"
+            className="flex min-w-0 justify-center [&_.instagram-media]:!min-w-0 [&_.instagram-media]:!max-w-full"
             dangerouslySetInnerHTML={{ __html: INSTAGRAM_EMBED_HTML_2 }}
           />
         </div>

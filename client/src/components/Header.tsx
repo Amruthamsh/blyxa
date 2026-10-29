@@ -65,13 +65,6 @@ export default function Header({ showCart, cartCount, onOpenCart, onNavigate }: 
           </button>
           <button
             type="button"
-            onClick={() => goTo('categories')}
-            className="text-sm font-medium text-forest-900/70 transition-colors hover:text-forest-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-moss-500 rounded"
-          >
-            Categories
-          </button>
-          <button
-            type="button"
             onClick={() => goTo('about')}
             className="text-sm font-medium text-forest-900/70 transition-colors hover:text-forest-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-moss-500 rounded"
           >
@@ -146,7 +139,7 @@ export default function Header({ showCart, cartCount, onOpenCart, onNavigate }: 
       {menuOpen && (
         <div className="border-t border-forest-900/10 bg-sand-50 px-4 py-4 md:hidden">
           <div className="flex flex-col gap-1">
-            {(['products', 'introduction', 'categories', 'about', 'contact'] as const).map((section) => (
+            {(['products', 'introduction', 'about', 'contact'] as const).map((section) => (
               <button
                 key={section}
                 type="button"

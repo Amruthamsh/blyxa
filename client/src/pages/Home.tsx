@@ -17,6 +17,7 @@ import SocialMedia from "../components/SocialMedia";
 import ProductGrid from "../components/ProductGrid";
 import CartDrawer, { WhatsAppIcon } from "../components/CartDrawer";
 import CheckoutModal from "../components/CheckoutModal";
+import ProductModal from "../components/ProductModal";
 import type {
   CheckoutDetails,
   CheckoutLineItem,
@@ -65,6 +66,7 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [cart, setCart] = useState<Record<string, number>>({});
   const [cartOpen, setCartOpen] = useState(false);
+  const [viewProduct, setViewProduct] = useState<Product | null>(null);
 
   const [toast, setToast] = useState<{ id: number; message: string } | null>(
     null,
@@ -366,6 +368,7 @@ export default function Home() {
               onAddToCart={addToCart}
               onOrderNow={orderNow}
               onDiscuss={discussProduct}
+              onView={setViewProduct}
               onRetry={fetchProducts}
             />
           </div>
@@ -451,9 +454,9 @@ export default function Home() {
                     ) : null}
                     <Button
                       variant="secondary"
-                      onClick={() => navigateTo("categories")}
+                      onClick={() => navigateTo("products")}
                     >
-                      Explore categories
+                      Browse the collection
                     </Button>
                   </div>
                   <p className="mt-4 text-xs text-forest-900/50">
@@ -528,12 +531,12 @@ export default function Home() {
 
         <section id="about" className="scroll-mt-24">
           <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
-            <div className="relative overflow-hidden rounded-[2.5rem] border border-forest-900/10 bg-gradient-to-br from-moss-50 via-white to-sand-100">
+            <div className="relative overflow-hidden rounded-3xl border border-forest-900/10 bg-gradient-to-br from-moss-50 via-white to-sand-100 sm:rounded-[2.5rem]">
               <div
                 aria-hidden="true"
                 className="pointer-events-none absolute -bottom-24 -left-16 h-64 w-64 rounded-full bg-moss-200/40 blur-3xl"
               />
-              <div className="relative grid gap-10 p-8 sm:p-12 lg:grid-cols-2 lg:gap-16 lg:p-16">
+              <div className="relative grid gap-8 p-6 sm:gap-10 sm:p-12 lg:grid-cols-2 lg:gap-16 lg:p-16">
                 <div>
                   <p className="mb-3 text-xs font-semibold uppercase tracking-[0.28em] text-moss-600">
                     About Blyxa
@@ -585,7 +588,7 @@ export default function Home() {
 
         <section id="contact" className="scroll-mt-24">
           <div className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8 lg:pb-24">
-            <div className="relative overflow-hidden rounded-[2.5rem] bg-forest-900 px-8 py-12 sm:px-12 lg:px-16 lg:py-16">
+            <div className="relative overflow-hidden rounded-3xl bg-forest-900 px-6 py-10 sm:rounded-[2.5rem] sm:px-12 sm:py-12 lg:px-16 lg:py-16">
               <div
                 aria-hidden="true"
                 className="pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full bg-moss-700/40 blur-3xl"
@@ -613,7 +616,7 @@ export default function Home() {
                     variant="whatsapp"
                     size="lg"
                     onClick={discussGeneral}
-                    className="shrink-0 bg-emerald-50 text-emerald-900 hover:bg-emerald-100"
+                    className="w-full shrink-0 bg-emerald-50 text-emerald-900 hover:bg-emerald-100 sm:w-auto"
                   >
                     <WhatsAppIcon />
                     Say hello on WhatsApp
@@ -731,7 +734,7 @@ export default function Home() {
         <div
           role="status"
           aria-live="polite"
-          className="fixed inset-x-0 top-0 z-[70] border-b border-moss-700/30 bg-moss-800 px-6 py-3 text-sand-50 shadow-lg"
+          className="fixed inset-x-0 top-0 z-[70] border-b border-moss-700/30 bg-moss-800 px-4 py-3 sm:px-6 text-sand-50 shadow-lg"
         >
           <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
             <div className="flex items-center gap-2.5">
@@ -763,7 +766,7 @@ export default function Home() {
                   )}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-full bg-moss-600 px-3.5 py-1.5 text-xs font-semibold text-sand-50 transition-colors hover:bg-moss-500"
+                  className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-moss-600 px-3.5 py-1.5 text-xs font-semibold text-sand-50 transition-colors hover:bg-moss-500"
                 >
                   <WhatsAppIcon className="h-3.5 w-3.5" />
                   Track on WhatsApp
@@ -795,6 +798,20 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      <ProductModal
+        product={viewProduct}
+        cartQty={viewProduct ? (cart[viewProduct.id] ?? 0) : 0}
+        commerceEnabled={CART_AND_ORDERS_ENABLED}
+        canDiscuss={hasNumber}
+        onClose={() => setViewProduct(null)}
+        onAddToCart={addToCart}
+        onOrderNow={(product) => {
+          setViewProduct(null);
+          orderNow(product);
+        }}
+        onDiscuss={discussProduct}
+      />
 
       {CART_AND_ORDERS_ENABLED && (
         <>

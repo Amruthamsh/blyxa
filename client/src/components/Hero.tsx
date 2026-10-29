@@ -59,17 +59,22 @@ export default function Hero({ onShop, onDiscuss }: HeroProps) {
             along with customized plant gifting for every occasion.
           </p>
 
-          <div className="mt-8 flex flex-wrap items-center gap-3">
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
             <Button
               variant="primary"
               size="lg"
               onClick={onShop}
-              className="group gap-2.5"
+              className="group w-full gap-2.5 sm:w-auto"
             >
               Explore our plants
               <ArrowIcon />
             </Button>
-            <Button variant="secondary" size="lg" onClick={onDiscuss}>
+            <Button
+              variant="secondary"
+              size="lg"
+              onClick={onDiscuss}
+              className="w-full sm:w-auto"
+            >
               Get in touch
             </Button>
           </div>

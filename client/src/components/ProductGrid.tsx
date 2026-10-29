@@ -14,6 +14,7 @@ interface ProductGridProps {
   onAddToCart: (product: Product) => void;
   onOrderNow: (product: Product) => void;
   onDiscuss: (product: Product) => void;
+  onView: (product: Product) => void;
   onRetry: () => void;
 }
 
@@ -27,6 +28,7 @@ export default function ProductGrid({
   onAddToCart,
   onOrderNow,
   onDiscuss,
+  onView,
   onRetry,
 }: ProductGridProps) {
   if (loading) return <ProductGridSkeleton />;
@@ -59,7 +61,7 @@ export default function ProductGrid({
   }
 
   return (
-    <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-8 lg:gap-y-14">
+    <div className="grid grid-cols-2 gap-x-3 gap-y-4 sm:gap-x-6 sm:gap-y-8 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-8 lg:gap-y-10">
       {products.map((product) => (
         <ProductCard
           key={product.id}
@@ -70,6 +72,7 @@ export default function ProductGrid({
           onAddToCart={onAddToCart}
           onOrderNow={onOrderNow}
           onDiscuss={onDiscuss}
+          onView={onView}
           canDiscuss={canDiscuss}
         />
       ))}
