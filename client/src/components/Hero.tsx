@@ -43,23 +43,23 @@ export default function Hero({ onShop, onDiscuss }: HeroProps) {
         <div className="absolute left-1/2 top-1/3 h-px w-40 -translate-x-1/2 bg-gradient-to-r from-transparent via-moss-300/40 to-transparent" />
       </div>
 
-      <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-9 px-4 pb-12 pt-10 sm:px-6 md:grid-cols-[1.05fr_0.95fr] lg:gap-16 lg:px-8 lg:pb-16 lg:pt-12">
+      <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-9 px-4 pb-8 pt-8 sm:px-6 sm:pb-12 sm:pt-10 md:grid-cols-[1.05fr_0.95fr] lg:gap-16 lg:px-8 lg:pb-16 lg:pt-12">
         <div className="min-w-0 max-w-xl">
           {/* <span className="inline-flex items-center gap-2.5 rounded-full border border-moss-200/80 bg-white/70 px-4 py-1.5 text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-moss-700 shadow-sm shadow-moss-900/5 backdrop-blur">
             <span className="h-1.5 w-1.5 rounded-full bg-moss-500" />
             Blyxa Plants Nursery
           </span> */}
 
-          <h1 className="mt-6 font-serif text-[2.6rem] font-medium leading-[1.03] tracking-tight text-forest-950 sm:text-5xl lg:text-[3.6rem]">
+          <h1 className="font-serif sm:mt-6 text-[2.6rem] font-medium leading-[1.03] tracking-tight text-forest-950 sm:text-5xl lg:text-[3.6rem]">
             A little closer to <em className="italic text-moss-600">Nature</em>
           </h1>
 
-          <p className="mt-6 max-w-lg text-base leading-relaxed text-forest-900/85">
+          <p className="mt-4 max-w-lg sm:mt-6 text-base leading-relaxed text-forest-900/85">
             Blyxa Plant Nursery offers a variety of plants, saplings, and herbs,
             along with customized plant gifting for every occasion.
           </p>
 
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+          <div className="mt-6 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:flex-wrap sm:items-center">
             <Button
               variant="primary"
               size="lg"
@@ -79,7 +79,7 @@ export default function Hero({ onShop, onDiscuss }: HeroProps) {
             </Button>
           </div>
 
-          <dl className="mt-8 grid max-w-md grid-cols-3 gap-5 border-t border-forest-900/10 pt-5">
+          <dl className="mt-6 grid grid-cols-3 gap-4 border-t border-forest-900/10 pt-5 sm:mt-8 sm:max-w-md sm:gap-5">
             <div>
               <dt className="text-[0.68rem] font-semibold uppercase tracking-wider text-forest-900/40">
                 Grown
