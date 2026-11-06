@@ -1,5 +1,6 @@
 import type { Product } from '../../lib/types'
 import { formatPrice } from '../../lib/format'
+import { SHOW_STOCK_ENABLED } from '../../lib/features'
 import EmptyState from '../EmptyState'
 import Button from '../Button'
 
@@ -36,6 +37,11 @@ export default function ProductTable({ products, onEdit, onAdd }: ProductTablePr
               </th>
               <th scope="col" className="px-6 py-4 font-semibold">
                 Stock
+                {!SHOW_STOCK_ENABLED && (
+                  <span className="ml-1.5 font-normal normal-case tracking-normal text-forest-900/40">
+                    (feature currently inactive)
+                  </span>
+                )}
               </th>
               <th scope="col" className="px-6 py-4 font-semibold">
                 Status

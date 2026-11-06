@@ -6,6 +6,7 @@ import ImageUploader from './ImageUploader'
 import type { ProductFormErrors } from '../../lib/validation'
 import { LIMITS } from '../../lib/validation'
 import { extractPlantDetailsFromDocx } from '../../lib/docxImport'
+import { SHOW_STOCK_ENABLED } from '../../lib/features'
 
 export interface ProductFormValues {
   name: string
@@ -280,7 +281,7 @@ export default function ProductForm({
                 error={fieldErrors?.price}
               />
               <Input
-                label="Stock"
+                label={SHOW_STOCK_ENABLED ? 'Stock' : 'Stock (feature currently inactive)'}
                 type="number"
                 required
                 min="0"
