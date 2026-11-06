@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { supabase } from "../lib/supabase";
 import type { Product } from "../lib/types";
@@ -15,6 +15,8 @@ import Header from "../components/Header";
 import Hero from "../components/Hero";
 import SocialMedia from "../components/SocialMedia";
 import ProductGrid from "../components/ProductGrid";
+import ProductFilters from "../components/ProductFilters";
+import EmptyState from "../components/EmptyState";
 import CartDrawer, { WhatsAppIcon } from "../components/CartDrawer";
 import CheckoutModal from "../components/CheckoutModal";
 import ProductModal from "../components/ProductModal";
@@ -67,6 +69,8 @@ export default function Home() {
   const [cart, setCart] = useState<Record<string, number>>({});
   const [cartOpen, setCartOpen] = useState(false);
   const [viewProduct, setViewProduct] = useState<Product | null>(null);
+  const [query, setQuery] = useState("");
+  const [priceRange, setPriceRange] = useState<[number, number] | null>(null);
 
   const [toast, setToast] = useState<{ id: number; message: string } | null>(
     null,
@@ -117,6 +121,50 @@ export default function Home() {
       document.body.style.overflow = "";
     };
   }, [cartOpen, checkoutOpen]);
+
+  const { priceBounds, priceStep } = useMemo(() => {
+    if (products.length === 0) {
+      return { priceBounds: [0, 0] as [number, number], priceStep: 1 };
+    }
+    const prices = products.map((p) => p.price);
+    const lo = Math.min(...prices);
+    const hi = Math.max(...prices);
+    const step = hi - lo >= 1000 ? 10 : hi - lo >= 100 ? 5 : 1;
+    return {
+      priceBounds: [
+        Math.floor(lo / step) * step,
+        Math.ceil(hi / step) * step,
+      ] as [number, number],
+      priceStep: step,
+    };
+  }, [products]);
+
+  // Clamp to current bounds in case products changed since the slider was moved
+  const activeRange: [number, number] = priceRange
+    ? [
+        Math.max(priceRange[0], priceBounds[0]),
+        Math.min(priceRange[1], priceBounds[1]),
+      ]
+    : priceBounds;
+  const priceFiltered =
+    activeRange[0] > priceBounds[0] || activeRange[1] < priceBounds[1];
+  const isFiltering = query.trim() !== "" || priceFiltered;
+
+  const filteredProducts = useMemo(() => {
+    const needle = query.trim().toLowerCase();
+    return products.filter((p) => {
+      if (p.price < activeRange[0] || p.price > activeRange[1]) return false;
+      if (!needle) return true;
+      return [p.name, p.botanical_name, p.family, p.plant_type].some((field) =>
+        field?.toLowerCase().includes(needle),
+      );
+    });
+  }, [products, query, activeRange[0], activeRange[1]]);
+
+  function clearFilters() {
+    setQuery("");
+    setPriceRange(null);
+  }
 
   const cartItems = products.filter((p) => cart[p.id]);
   const cartCount = cartItems.reduce((sum, p) => sum + cart[p.id], 0);
@@ -358,19 +406,47 @@ export default function Home() {
               </div>
             </div> */}
 
-            <ProductGrid
-              products={products}
-              loading={loading}
-              error={error}
-              cart={cart}
-              commerceEnabled={CART_AND_ORDERS_ENABLED}
-              canDiscuss={hasNumber}
-              onAddToCart={addToCart}
-              onOrderNow={orderNow}
-              onDiscuss={discussProduct}
-              onView={setViewProduct}
-              onRetry={fetchProducts}
-            />
+            {!loading && !error && products.length > 0 && (
+              <ProductFilters
+                query={query}
+                priceBounds={priceBounds}
+                priceStep={priceStep}
+                priceRange={activeRange}
+                isFiltering={isFiltering}
+                resultCount={filteredProducts.length}
+                totalCount={products.length}
+                onQueryChange={setQuery}
+                onPriceRangeChange={setPriceRange}
+                onClear={clearFilters}
+              />
+            )}
+
+            {!loading &&
+            !error &&
+            products.length > 0 &&
+            filteredProducts.length === 0 ? (
+              <EmptyState
+                compact
+                title="No plants match your filters"
+                message="Try a different search term or widen the price range."
+                actionLabel="Clear filters"
+                onAction={clearFilters}
+              />
+            ) : (
+              <ProductGrid
+                products={filteredProducts}
+                loading={loading}
+                error={error}
+                cart={cart}
+                commerceEnabled={CART_AND_ORDERS_ENABLED}
+                canDiscuss={hasNumber}
+                onAddToCart={addToCart}
+                onOrderNow={orderNow}
+                onDiscuss={discussProduct}
+                onView={setViewProduct}
+                onRetry={fetchProducts}
+              />
+            )}
           </div>
         </section>
 
