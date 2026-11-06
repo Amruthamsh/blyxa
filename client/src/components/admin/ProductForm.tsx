@@ -24,6 +24,7 @@ export interface ProductFormValues {
   propagation: string
   safety_note: string
   price: string
+  price_max: string
   stock: string
   is_active: boolean
 }
@@ -280,6 +281,26 @@ export default function ProductForm({
                 placeholder="0.00"
                 error={fieldErrors?.price}
               />
+              <div>
+                <Input
+                  label="Max price (₹)"
+                  optional
+                  type="number"
+                  min="0"
+                  max={LIMITS.price}
+                  step="0.01"
+                  value={values.price_max}
+                  onChange={(e) => onFieldChange('price_max', e.target.value)}
+                  placeholder="Leave empty for a single price"
+                  error={fieldErrors?.price_max}
+                />
+                {!fieldErrors?.price_max && (
+                  <p className="mt-1.5 text-xs text-forest-900/50">
+                    Shows as a range, e.g. ₹600 – ₹3,000. Ranged plants are
+                    enquiry-only and can't be ordered online.
+                  </p>
+                )}
+              </div>
               <Input
                 label={SHOW_STOCK_ENABLED ? 'Stock' : 'Stock (feature currently inactive)'}
                 type="number"

@@ -33,6 +33,7 @@ const emptyProductForm: ProductFormValues = {
   propagation: '',
   safety_note: '',
   price: '',
+  price_max: '',
   stock: '0',
   is_active: true,
 }
@@ -136,6 +137,7 @@ export default function Admin() {
       propagation: product.propagation ?? '',
       safety_note: product.safety_note ?? '',
       price: String(product.price),
+      price_max: product.price_max != null ? String(product.price_max) : '',
       stock: String(product.stock),
       is_active: product.is_active,
     })
@@ -182,6 +184,9 @@ export default function Admin() {
 
     const textOrNull = (value: string) => value.trim() || null
     const price = parseFloat(productForm.price)
+    const priceMax = productForm.price_max.trim()
+      ? parseFloat(productForm.price_max)
+      : null
     const stock = parseInt(productForm.stock, 10) || 0
     if (!editingProduct && !imageFile) {
       setError('Please upload a product image. A product must have a photo.')
@@ -204,6 +209,7 @@ export default function Admin() {
       propagation: textOrNull(productForm.propagation),
       safety_note: textOrNull(productForm.safety_note),
       price,
+      price_max: priceMax,
       stock,
       is_active: productForm.is_active,
     }

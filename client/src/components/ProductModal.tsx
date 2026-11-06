@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import type { Product } from '../lib/types'
-import { formatPrice } from '../lib/format'
+import { formatProductPrice, hasPriceRange } from '../lib/format'
 import { SHOW_STOCK_ENABLED } from '../lib/features'
 import Button from './Button'
 import { WhatsAppIcon } from './CartDrawer'
@@ -46,6 +46,7 @@ export default function ProductModal({
   const outOfStock = product.stock <= 0
   const available = Math.max(product.stock - cartQty, 0)
   const atMax = available <= 0
+  const orderable = commerceEnabled && !hasPriceRange(product)
 
   const stockLabel = outOfStock
     ? 'Out of stock'
@@ -149,7 +150,7 @@ export default function ProductModal({
 
               <div className="mt-4 flex items-baseline justify-between gap-3 border-t border-forest-900/10 pt-3">
                 <p className="text-xl font-bold text-forest-950 sm:text-2xl">
-                  {formatPrice(product.price)}
+                  {formatProductPrice(product)}
                 </p>
                 {SHOW_STOCK_ENABLED && (
                   <p
@@ -201,7 +202,7 @@ export default function ProductModal({
                   Enquire on WhatsApp
                 </Button>
               )}
-              {commerceEnabled && (
+              {orderable && (
                 <>
                   <Button
                     variant="secondary"

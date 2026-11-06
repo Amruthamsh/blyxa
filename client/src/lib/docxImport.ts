@@ -14,10 +14,11 @@ export interface ImportedPlantDetails {
   propagation?: string
   safety_note?: string
   price?: string
+  price_max?: string
   stock?: string
 }
 
-type DetailKey = Exclude<keyof ImportedPlantDetails, 'name' | 'price' | 'stock'>
+type DetailKey = Exclude<keyof ImportedPlantDetails, 'name' | 'price' | 'price_max' | 'stock'>
 
 const FIELD_DEFINITIONS: { key: DetailKey; labels: string[] }[] = [
   {
@@ -302,9 +303,12 @@ export function parsePlantDetails(text: string): ImportedPlantDetails {
   }
 
   const priceMatch = text.match(
-    /(?:price|mrp)\s*:\s*(?:₹|rs\.?|inr)?\s*([\d,]+(?:\.\d{1,2})?)/i,
+    /(?:price|mrp)\s*:\s*(?:₹|rs\.?|inr)?\s*([\d,]+(?:\.\d{1,2})?)(?:\s*(?:-|–|—|to)\s*(?:₹|rs\.?|inr)?\s*([\d,]+(?:\.\d{1,2})?))?/i,
   )
-  if (priceMatch) details.price = priceMatch[1].replace(/,/g, '')
+  if (priceMatch) {
+    details.price = priceMatch[1].replace(/,/g, '')
+    if (priceMatch[2]) details.price_max = priceMatch[2].replace(/,/g, '')
+  }
 
   const stockMatch = text.match(/(?:stock|quantity|available)\s*:\s*(\d+)/i)
   if (stockMatch) details.stock = stockMatch[1]

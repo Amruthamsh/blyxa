@@ -1,5 +1,5 @@
 import type { Product } from '../../lib/types'
-import { formatPrice } from '../../lib/format'
+import { formatProductPrice } from '../../lib/format'
 import { SHOW_STOCK_ENABLED } from '../../lib/features'
 import EmptyState from '../EmptyState'
 import Button from '../Button'
@@ -86,7 +86,7 @@ export default function ProductTable({ products, onEdit, onAdd }: ProductTablePr
                   </div>
                 </td>
                 <td className="whitespace-nowrap px-6 py-4 font-semibold text-forest-950">
-                  {formatPrice(product.price)}
+                  {formatProductPrice(product)}
                 </td>
                 <td className="px-6 py-4">
                   <StockBadge stock={product.stock} />
@@ -148,7 +148,7 @@ export default function ProductTable({ products, onEdit, onAdd }: ProductTablePr
               )}
               <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-forest-900/60">
                 <span className="font-bold text-forest-950">
-                  {formatPrice(product.price)}
+                  {formatProductPrice(product)}
                 </span>
                 <StockBadge stock={product.stock} />
                 <span

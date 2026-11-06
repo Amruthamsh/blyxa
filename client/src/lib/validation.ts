@@ -58,6 +58,7 @@ export interface ProductFormErrors {
   propagation?: string
   safety_note?: string
   price?: string
+  price_max?: string
   stock?: string
 }
 
@@ -77,6 +78,7 @@ export interface ProductFormValuesForValidation {
   propagation: string
   safety_note: string
   price: string
+  price_max: string
   stock: string
 }
 
@@ -125,6 +127,17 @@ export function validateProductForm(
     errors.price = 'Price cannot be negative.'
   } else if (price > LIMITS.price) {
     errors.price = `Price must be ${LIMITS.price} or less.`
+  }
+
+  if (isRequired(values.price_max)) {
+    const priceMax = parseFloat(values.price_max)
+    if (Number.isNaN(priceMax)) {
+      errors.price_max = 'Please enter a valid max price, or leave it empty.'
+    } else if (priceMax > LIMITS.price) {
+      errors.price_max = `Max price must be ${LIMITS.price} or less.`
+    } else if (!Number.isNaN(price) && priceMax <= price) {
+      errors.price_max = 'Max price must be higher than the price.'
+    }
   }
 
   const stock = parseInt(values.stock, 10)

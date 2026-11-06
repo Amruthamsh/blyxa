@@ -1,5 +1,5 @@
 import type { Product } from '../lib/types'
-import { formatPrice } from '../lib/format'
+import { formatProductPrice, hasPriceRange } from '../lib/format'
 import { SHOW_STOCK_ENABLED } from '../lib/features'
 import Button from './Button'
 
@@ -29,6 +29,7 @@ export default function ProductCard({
   const outOfStock = product.stock <= 0
   const available = Math.max(product.stock - cartQty, 0)
   const atMax = available <= 0
+  const orderable = commerceEnabled && !hasPriceRange(product)
 
   const stockLabel = outOfStock
     ? 'Out of stock'
@@ -101,7 +102,7 @@ export default function ProductCard({
 
         <div className="mt-auto flex flex-wrap items-baseline justify-between pt-2 gap-x-2 gap-y-0.5">
           <p className="text-base font-bold text-forest-950 sm:text-lg">
-            {formatPrice(product.price)}
+            {formatProductPrice(product)}
           </p>
           {SHOW_STOCK_ENABLED && (
             <p
@@ -114,7 +115,7 @@ export default function ProductCard({
           )}
         </div>
 
-        {commerceEnabled ? (
+        {orderable ? (
           <>
             <div
               className="mt-3 flex flex-col gap-2 sm:flex-row"

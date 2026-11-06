@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { supabase } from "../lib/supabase";
 import type { Product } from "../lib/types";
-import { formatPrice } from "../lib/format";
+import { formatPrice, formatProductPrice, hasPriceRange } from "../lib/format";
 import { CART_AND_ORDERS_ENABLED } from "../lib/features";
 import {
   MESSAGES,
@@ -126,9 +126,8 @@ export default function Home() {
     if (products.length === 0) {
       return { priceBounds: [0, 0] as [number, number], priceStep: 1 };
     }
-    const prices = products.map((p) => p.price);
-    const lo = Math.min(...prices);
-    const hi = Math.max(...prices);
+    const lo = Math.min(...products.map((p) => p.price));
+    const hi = Math.max(...products.map((p) => p.price_max ?? p.price));
     const step = hi - lo >= 1000 ? 10 : hi - lo >= 100 ? 5 : 1;
     return {
       priceBounds: [
@@ -153,7 +152,9 @@ export default function Home() {
   const filteredProducts = useMemo(() => {
     const needle = query.trim().toLowerCase();
     return products.filter((p) => {
-      if (p.price < activeRange[0] || p.price > activeRange[1]) return false;
+      // A ranged product matches if its range overlaps the selected one
+      const top = p.price_max ?? p.price;
+      if (top < activeRange[0] || p.price > activeRange[1]) return false;
       if (!needle) return true;
       return [p.name, p.botanical_name, p.family, p.plant_type].some((field) =>
         field?.toLowerCase().includes(needle),
@@ -186,6 +187,7 @@ export default function Home() {
   }
 
   function addToCart(product: Product) {
+    if (hasPriceRange(product)) return;
     if ((cart[product.id] ?? 0) >= product.stock) return;
     setCart((prev) => ({
       ...prev,
@@ -195,6 +197,7 @@ export default function Home() {
   }
 
   function orderNow(product: Product) {
+    if (hasPriceRange(product)) return;
     setCartOpen(false);
     setCheckoutError(null);
     setCheckoutProduct(product);
@@ -206,7 +209,7 @@ export default function Home() {
     openWhatsApp(
       whatsappNumber,
       buildDiscussionMessage(
-        [`- ${product.name} (${formatPrice(product.price)})`],
+        [`- ${product.name} (${formatProductPrice(product)})`],
         MESSAGES.discussPlant,
       ),
     );

@@ -117,6 +117,7 @@ Deno.serve(async (req)=>{
         id,
         name,
         price,
+        price_max,
         stock,
         is_active
       FROM public.products
@@ -146,6 +147,10 @@ Deno.serve(async (req)=>{
       }
       const stock = Number(product.stock);
       const price = Number(product.price);
+      // Ranged products are priced on enquiry only
+      if (product.price_max != null && Number(product.price_max) > price) {
+        throw new Error(`"${product.name}" is priced on enquiry. Please contact us on WhatsApp to order it`);
+      }
       if (stock < item.quantity) {
         throw new Error(`Insufficient stock for "${product.name}"`);
       }

@@ -15,6 +15,7 @@ export interface Product {
   propagation: string | null
   safety_note: string | null
   price: number
+  price_max: number | null
   stock: number
   image_url: string | null
   is_active: boolean
