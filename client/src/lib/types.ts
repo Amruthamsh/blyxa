@@ -14,6 +14,7 @@ export interface Product {
   traditional_uses: string | null
   propagation: string | null
   safety_note: string | null
+  categories: string[]
   price: number
   price_max: number | null
   stock: number

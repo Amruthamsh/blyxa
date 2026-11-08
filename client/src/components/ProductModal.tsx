@@ -142,6 +142,18 @@ export default function ProductModal({
                     .join(' · ')}
                 </p>
               )}
+              {product.categories?.length > 0 && (
+                <div className="mt-2.5 flex flex-wrap gap-1.5">
+                  {product.categories.map((category) => (
+                    <span
+                      key={category}
+                      className="rounded-full border border-moss-200 bg-moss-50 px-2.5 py-0.5 text-[0.7rem] font-semibold text-moss-700"
+                    >
+                      {category}
+                    </span>
+                  ))}
+                </div>
+              )}
               {product.description && (
                 <p className="mt-3 text-sm leading-relaxed text-forest-900/70">
                   {product.description}

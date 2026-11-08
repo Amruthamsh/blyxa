@@ -5,11 +5,14 @@ interface ProductFiltersProps {
   priceBounds: [number, number];
   priceStep: number;
   priceRange: [number, number];
+  categories: { name: string; count: number }[];
+  selectedCategories: string[];
   isFiltering: boolean;
   resultCount: number;
   totalCount: number;
   onQueryChange: (value: string) => void;
   onPriceRangeChange: (range: [number, number]) => void;
+  onToggleCategory: (category: string) => void;
   onClear: () => void;
 }
 
@@ -18,11 +21,14 @@ export default function ProductFilters({
   priceBounds,
   priceStep,
   priceRange,
+  categories,
+  selectedCategories,
   isFiltering,
   resultCount,
   totalCount,
   onQueryChange,
   onPriceRangeChange,
+  onToggleCategory,
   onClear,
 }: ProductFiltersProps) {
   const [boundMin, boundMax] = priceBounds;
@@ -103,6 +109,38 @@ export default function ProductFilters({
           </div>
         )}
       </div>
+
+      {categories.length > 0 && (
+        <div
+          role="group"
+          aria-label="Filter by category"
+          className="-mx-4 mt-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0"
+        >
+          {categories.map(({ name, count }) => {
+            const selected = selectedCategories.includes(name);
+            return (
+              <button
+                key={name}
+                type="button"
+                aria-pressed={selected}
+                onClick={() => onToggleCategory(name)}
+                className={`inline-flex shrink-0 cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-moss-500/40 ${
+                  selected
+                    ? "border-moss-600 bg-moss-600 text-white hover:bg-moss-700"
+                    : "border-forest-900/15 bg-white text-forest-900/70 hover:border-moss-400 hover:bg-moss-50"
+                }`}
+              >
+                {name}
+                <span
+                  className={selected ? "text-white/70" : "text-forest-900/40"}
+                >
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {isFiltering && (
         <div className="mt-3 flex items-center justify-between text-sm text-forest-900/60">

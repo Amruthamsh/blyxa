@@ -4,6 +4,7 @@ import { supabase } from "../lib/supabase";
 import type { Product } from "../lib/types";
 import { formatPrice, formatProductPrice, hasPriceRange } from "../lib/format";
 import { CART_AND_ORDERS_ENABLED } from "../lib/features";
+import { PRODUCT_CATEGORIES } from "../lib/categories";
 import {
   MESSAGES,
   buildDiscussionMessage,
@@ -71,6 +72,7 @@ export default function Home() {
   const [viewProduct, setViewProduct] = useState<Product | null>(null);
   const [query, setQuery] = useState("");
   const [priceRange, setPriceRange] = useState<[number, number] | null>(null);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   const [toast, setToast] = useState<{ id: number; message: string } | null>(
     null,
@@ -138,6 +140,23 @@ export default function Home() {
     };
   }, [products]);
 
+  // Only offer categories that at least one plant is tagged with, in the
+  // configured order, followed by any older names no longer in the list
+  const categoryOptions = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const p of products) {
+      for (const c of p.categories ?? []) {
+        counts.set(c, (counts.get(c) ?? 0) + 1);
+      }
+    }
+    const known: string[] = [...PRODUCT_CATEGORIES];
+    const ordered = [
+      ...known.filter((c) => counts.has(c)),
+      ...[...counts.keys()].filter((c) => !known.includes(c)).sort(),
+    ];
+    return ordered.map((name) => ({ name, count: counts.get(name)! }));
+  }, [products]);
+
   // Clamp to current bounds in case products changed since the slider was moved
   const activeRange: [number, number] = priceRange
     ? [
@@ -147,7 +166,8 @@ export default function Home() {
     : priceBounds;
   const priceFiltered =
     activeRange[0] > priceBounds[0] || activeRange[1] < priceBounds[1];
-  const isFiltering = query.trim() !== "" || priceFiltered;
+  const isFiltering =
+    query.trim() !== "" || priceFiltered || selectedCategories.length > 0;
 
   const filteredProducts = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -155,16 +175,32 @@ export default function Home() {
       // A ranged product matches if its range overlaps the selected one
       const top = p.price_max ?? p.price;
       if (top < activeRange[0] || p.price > activeRange[1]) return false;
+      // A plant matches if it is in any of the selected categories
+      if (
+        selectedCategories.length > 0 &&
+        !selectedCategories.some((c) => p.categories?.includes(c))
+      ) {
+        return false;
+      }
       if (!needle) return true;
       return [p.name, p.botanical_name, p.family, p.plant_type].some((field) =>
         field?.toLowerCase().includes(needle),
       );
     });
-  }, [products, query, activeRange[0], activeRange[1]]);
+  }, [products, query, selectedCategories, activeRange[0], activeRange[1]]);
 
   function clearFilters() {
     setQuery("");
     setPriceRange(null);
+    setSelectedCategories([]);
+  }
+
+  function toggleCategory(category: string) {
+    setSelectedCategories((prev) =>
+      prev.includes(category)
+        ? prev.filter((c) => c !== category)
+        : [...prev, category],
+    );
   }
 
   const cartItems = products.filter((p) => cart[p.id]);
@@ -415,11 +451,14 @@ export default function Home() {
                 priceBounds={priceBounds}
                 priceStep={priceStep}
                 priceRange={activeRange}
+                categories={categoryOptions}
+                selectedCategories={selectedCategories}
                 isFiltering={isFiltering}
                 resultCount={filteredProducts.length}
                 totalCount={products.length}
                 onQueryChange={setQuery}
                 onPriceRangeChange={setPriceRange}
+                onToggleCategory={toggleCategory}
                 onClear={clearFilters}
               />
             )}
@@ -431,7 +470,7 @@ export default function Home() {
               <EmptyState
                 compact
                 title="No plants match your filters"
-                message="Try a different search term or widen the price range."
+                message="Try a different search term, category, or price range."
                 actionLabel="Clear filters"
                 onAction={clearFilters}
               />

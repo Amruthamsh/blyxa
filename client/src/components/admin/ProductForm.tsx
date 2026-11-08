@@ -7,6 +7,7 @@ import type { ProductFormErrors } from '../../lib/validation'
 import { LIMITS } from '../../lib/validation'
 import { extractPlantDetailsFromDocx } from '../../lib/docxImport'
 import { SHOW_STOCK_ENABLED } from '../../lib/features'
+import { PRODUCT_CATEGORIES } from '../../lib/categories'
 
 export interface ProductFormValues {
   name: string
@@ -23,6 +24,7 @@ export interface ProductFormValues {
   traditional_uses: string
   propagation: string
   safety_note: string
+  categories: string[]
   price: string
   price_max: string
   stock: string
@@ -38,7 +40,10 @@ interface ProductFormProps {
   saving: boolean
   error: string | null
   fieldErrors?: ProductFormErrors
-  onFieldChange: (field: keyof ProductFormValues, value: string | boolean) => void
+  onFieldChange: (
+    field: keyof ProductFormValues,
+    value: string | boolean | string[],
+  ) => void
   onImageChange: (file: File | null) => void
   onSubmit: (event: FormEvent) => void
   onCancel: () => void
@@ -65,6 +70,15 @@ export default function ProductForm({
   const [importing, setImporting] = useState(false)
   const [importMessage, setImportMessage] = useState<string | null>(null)
   const [importError, setImportError] = useState<string | null>(null)
+
+  function toggleCategory(category: string) {
+    onFieldChange(
+      'categories',
+      values.categories.includes(category)
+        ? values.categories.filter((c) => c !== category)
+        : [...values.categories, category],
+    )
+  }
 
   async function handleDocxChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0]
@@ -256,6 +270,36 @@ export default function ProductForm({
               maxLength={LIMITS.plantType}
               error={fieldErrors?.plant_type}
             />
+
+            <fieldset>
+              <legend className="mb-2 text-sm font-medium text-forest-900">
+                Categories{' '}
+                <span className="font-normal text-forest-900/45">
+                  (choose all that apply)
+                </span>
+              </legend>
+              <div className="flex flex-wrap gap-2">
+                {PRODUCT_CATEGORIES.map((category) => {
+                  const selected = values.categories.includes(category)
+                  return (
+                    <button
+                      key={category}
+                      type="button"
+                      aria-pressed={selected}
+                      disabled={saving}
+                      onClick={() => toggleCategory(category)}
+                      className={`cursor-pointer rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
+                        selected
+                          ? 'border-moss-600 bg-moss-600 text-white hover:bg-moss-700'
+                          : 'border-forest-900/15 bg-white text-forest-900/70 hover:border-moss-400 hover:bg-moss-50'
+                      }`}
+                    >
+                      {category}
+                    </button>
+                  )
+                })}
+              </div>
+            </fieldset>
 
             <TextArea
               label="Description"

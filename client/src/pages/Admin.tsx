@@ -32,6 +32,7 @@ const emptyProductForm: ProductFormValues = {
   traditional_uses: '',
   propagation: '',
   safety_note: '',
+  categories: [],
   price: '',
   price_max: '',
   stock: '0',
@@ -136,6 +137,7 @@ export default function Admin() {
       traditional_uses: product.traditional_uses ?? '',
       propagation: product.propagation ?? '',
       safety_note: product.safety_note ?? '',
+      categories: product.categories ?? [],
       price: String(product.price),
       price_max: product.price_max != null ? String(product.price_max) : '',
       stock: String(product.stock),
@@ -208,6 +210,7 @@ export default function Admin() {
       traditional_uses: textOrNull(productForm.traditional_uses),
       propagation: textOrNull(productForm.propagation),
       safety_note: textOrNull(productForm.safety_note),
+      categories: productForm.categories,
       price,
       price_max: priceMax,
       stock,
@@ -272,7 +275,10 @@ export default function Admin() {
     setStatusUpdating(false)
   }
 
-  function updateProductForm(field: keyof typeof emptyProductForm, value: string | boolean) {
+  function updateProductForm(
+    field: keyof typeof emptyProductForm,
+    value: string | boolean | string[],
+  ) {
     setProductForm((prev) => ({ ...prev, [field]: value }))
     setProductFieldErrors((prev) =>
       prev[field as keyof ProductFormErrors]
