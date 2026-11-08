@@ -399,7 +399,10 @@ export default function Home() {
 
       <main>
         <Hero
+          products={products}
+          categories={categoryOptions}
           onShop={() => navigateTo("products")}
+          onViewProduct={setViewProduct}
           onDiscuss={discussGeneral}
         />
 

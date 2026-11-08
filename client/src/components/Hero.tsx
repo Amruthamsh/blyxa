@@ -1,8 +1,36 @@
 import Button from "./Button";
+import HeroCarousel from "./HeroCarousel";
+import type { Product } from "../lib/types";
 
 interface HeroProps {
+  products: Product[];
+  categories: { name: string; count: number }[];
   onShop: () => void;
   onDiscuss: () => void;
+  onViewProduct: (product: Product) => void;
+}
+
+const MAX_SLIDES = 12;
+
+// One plant from each category first so every category gets seen,
+// then fill the remaining slides with the newest plants
+function pickSlides(
+  products: Product[],
+  categories: { name: string }[],
+): Product[] {
+  const withImages = products.filter((p) => p.image_url);
+  const picked = new Set<Product>();
+  for (const { name } of categories) {
+    const match = withImages.find(
+      (p) => !picked.has(p) && p.categories?.includes(name),
+    );
+    if (match) picked.add(match);
+  }
+  for (const p of withImages) {
+    if (picked.size >= MAX_SLIDES) break;
+    picked.add(p);
+  }
+  return [...picked].slice(0, MAX_SLIDES);
 }
 
 function ArrowIcon() {
@@ -25,7 +53,15 @@ function ArrowIcon() {
   );
 }
 
-export default function Hero({ onShop, onDiscuss }: HeroProps) {
+export default function Hero({
+  products,
+  categories,
+  onShop,
+  onDiscuss,
+  onViewProduct,
+}: HeroProps) {
+  const slides = pickSlides(products, categories);
+
   return (
     <section className="relative overflow-hidden">
       <div
@@ -112,16 +148,28 @@ export default function Hero({ onShop, onDiscuss }: HeroProps) {
             aria-hidden="true"
             className="absolute -inset-4 rounded-[3.25rem] bg-gradient-to-br from-moss-200/50 via-white/40 to-sand-200/60 blur-2xl"
           />
-          <div className="relative overflow-hidden rounded-[2.75rem] border border-white/80 bg-white p-2.5 shadow-[0_36px_90px_-38px_rgba(26,40,34,0.42)] sm:p-3">
-            <div className="overflow-hidden rounded-[2.1rem] bg-sand-50">
-              <img
-                src="/logo1.jpeg"
-                alt="Blyxa Plants Nursery — bringing the beauty of nature to your home and garden"
-                className="h-full w-full object-cover"
-                fetchPriority="high"
-              />
-            </div>
+          <div className="relative overflow-hidden rounded-[2.75rem] border border-white/80 bg-white p-1 shadow-[0_36px_90px_-38px_rgba(26,40,34,0.42)]">
+            {slides.length > 0 ? (
+              <HeroCarousel products={slides} onView={onViewProduct} />
+            ) : (
+              <div className="overflow-hidden rounded-[2.5rem] bg-sand-50">
+                <img
+                  src="/logo1.jpeg"
+                  alt="Blyxa Plants Nursery — bringing the beauty of nature to your home and garden"
+                  className="h-full w-full object-cover"
+                  fetchPriority="high"
+                />
+              </div>
+            )}
           </div>
+
+          {slides.length > 0 && (
+            <p className="relative mt-5 flex items-center justify-center gap-3 text-xs font-semibold uppercase tracking-[0.28em] text-moss-600">
+              <span className="h-px w-8 bg-moss-400/70" aria-hidden="true" />
+              What we sell
+              <span className="h-px w-8 bg-moss-400/70" aria-hidden="true" />
+            </p>
+          )}
 
           {/* <div className="absolute -right-2 top-6 rounded-2xl border border-white/80 bg-white/90 px-4 py-3 shadow-lg shadow-forest-950/10 backdrop-blur sm:-right-4">
             <p className="text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-moss-600">
